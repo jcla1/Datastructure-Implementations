@@ -13,5 +13,6 @@ typedef struct hash_map {
 } hash_map;
 
 hash_map *hash_map_create(int num_buckets, hash_fn_t fn);
+void hash_map_destroy(hash_map *hm);
 void hash_map_set(hash_map *hm, void *key, void *value);
 void *hash_map_get(hash_map *hm, void *key);

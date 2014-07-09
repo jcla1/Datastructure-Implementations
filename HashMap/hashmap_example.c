@@ -21,6 +21,8 @@ int main() {
 
   int val = *(int*)hash_map_get(hm, "hello, world!");
 
+  hash_map_destroy(hm);
+
   printf("Got value: %d\n", val);
   return 0;
 }

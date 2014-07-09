@@ -6,6 +6,7 @@ typedef struct pair {
 } pair;
 
 typedef struct hash_map {
+  int ocupied_buckets;
   int num_buckets;
   hash_fn_t fn;
 

@@ -13,6 +13,7 @@ hash_map *hash_map_create(int num_buckets, hash_fn_t fn) {
     return NULL;
   }
 
+  hm->ocupied_buckets = 0;
   hm->num_buckets = num_buckets;
   hm->fn = fn;
 
@@ -20,6 +21,9 @@ hash_map *hash_map_create(int num_buckets, hash_fn_t fn) {
 }
 
 void hash_map_destroy(hash_map *hm) {
+  if (hm == NULL)
+    return
+
   pair *p;
 
   for (int i = 0; i < hm->num_buckets; i++) {
@@ -52,9 +56,14 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
 
 void *hash_map_get(hash_map *hm, void *key) {
   pair *p;
-  int hash = hm->fn(key);
+  int hash;
 
+  hash = hm->fn(key);
   p = hm->buckets[hash % hm->num_buckets];
+  if (p == NULL) {
+    fprintf(stderr, "[hash_map_get]: key not found in table\n");
+  }
+
 
   return p->snd;
 }

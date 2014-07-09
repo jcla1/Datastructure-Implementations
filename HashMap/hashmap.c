@@ -55,7 +55,7 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   hm->buckets[hash % hm->num_buckets] = p;
 }
 
-void *hash_map_get(hash_map *hm, void *key) {
+void *hash_map_get(const hash_map *hm, void *key) {
   pair *p;
   int hash;
 

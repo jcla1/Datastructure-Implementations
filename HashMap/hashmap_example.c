@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "hashmap.h"
 
 int sum_chars(void *str) {
@@ -13,8 +14,12 @@ int sum_chars(void *str) {
   return sum;
 }
 
+int my_cmp(void *s1, void *s2) {
+  return strcmp((char*)s1, (char*)s2);
+}
+
 int main() {
-  hash_map *hm = hash_map_create(15, sum_chars);
+  hash_map *hm = hash_map_create(15, sum_chars, my_cmp);
 
   int forty_two = 42;
   hash_map_set(hm, "hello, world!", &forty_two);

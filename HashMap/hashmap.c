@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "hashmap.h"
 
-hash_map *hash_map_create(int num_buckets, hash_fn_t fn) {
+hash_map *hash_map_create(int num_buckets, hash_fn_t hash_fn, cmp_fn_t cmp_fn) {
   hash_map *hm = (hash_map*)malloc(sizeof(hash_map));
   if (hm == NULL)
     return NULL;
@@ -15,14 +15,15 @@ hash_map *hash_map_create(int num_buckets, hash_fn_t fn) {
 
   hm->ocupied_buckets = 0;
   hm->num_buckets = num_buckets;
-  hm->fn = fn;
+  hm->hash_fn = hash_fn;
+  hm->cmp_fn = cmp_fn;
 
   return hm;
 }
 
 void hash_map_destroy(hash_map *hm) {
   if (hm == NULL)
-    return
+    return;
 
   pair *p;
 
@@ -49,7 +50,7 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   p->fst = key;
   p->snd = value;
 
-  hash = hm->fn(key);
+  hash = hm->hash_fn(key);
 
   hm->buckets[hash % hm->num_buckets] = p;
 }
@@ -58,10 +59,12 @@ void *hash_map_get(hash_map *hm, void *key) {
   pair *p;
   int hash;
 
-  hash = hm->fn(key);
+  hash = hm->hash_fn(key);
   p = hm->buckets[hash % hm->num_buckets];
-  if (p == NULL) {
+
+  if (p == NULL || hm->cmp_fn(p->fst, key) != 0) {
     fprintf(stderr, "[hash_map_get]: key not found in table\n");
+    return NULL;
   }
 
 

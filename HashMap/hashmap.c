@@ -32,7 +32,7 @@ void hash_map_destroy(hash_map *hm) {
 
   pair *p;
 
-  for (int i = 0; i < hm->num_buckets; i++) {
+  for(int i = 0; i < hm->num_buckets; i++) {
     if ((p = (hm->buckets[i])) != NULL) {
       pair_destroy(p);
     }
@@ -43,6 +43,7 @@ void hash_map_destroy(hash_map *hm) {
 }
 
 void hash_map_set(hash_map *hm, void *key, void *value) {
+  int idx;
   pair *p;
 
   p = (pair*)malloc(sizeof(pair));
@@ -54,35 +55,57 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   p->fst = key;
   p->snd = value;
 
-  hm->buckets[hash_map_get_index(hm, key)] = p;
+  idx = hash_map_get_index(hm, key, 1);
+  if(idx < 0) {
+    fprintf(stderr, "[hash_map_set]: not enough space.\n");
+    return;
+  }
+
+  hm->buckets[idx] = p;
 }
 
 void *hash_map_get(const hash_map *hm, void *key) {
-  pair *p;
+  int idx = hash_map_get_index(hm, key, 0);
 
-  p = hm->buckets[hash_map_get_index(hm, key)];
-
-  if (p == NULL || hm->cmp_fn(p->fst, key) != 0) {
+  if(idx < 0) {
     fprintf(stderr, "[hash_map_get]: key not found in table\n");
     return NULL;
   }
 
-
-  return p->snd;
+  return hm->buckets[idx]->snd;
 }
 
 void hash_map_delete(hash_map *hm, void *key) {
-  pair **p;
+  int idx = hash_map_get_index(hm, key, 0);
 
-  p = &hm->buckets[hash_map_get_index(hm, key)];
+  if(idx < 0)
+    return;
+
+  pair **p = &hm->buckets[idx];
   pair_destroy(*p);
   *p = NULL;
 }
 
-// Will return the index for the given key.
-// Might use (linear/quadratic) probing, if
-// empty cell is met before key, returns that.
-static int hash_map_get_index(const hash_map *hm, void *key) {
+// the is_free parameter states if the cell searched for is allowed to be NULL
+static int hash_map_get_index(const hash_map *hm, void *key, int is_free) {
   int hash = hm->hash_fn(key);
-  return hash % hm->num_buckets;
+  int orig_idx = hash % hm->num_buckets;
+
+  if((hm->buckets[orig_idx] == NULL && is_free)
+      || (!is_free && hm->cmp_fn(hm->buckets[orig_idx]->fst, key) == 0))
+      return orig_idx;
+
+
+  for(int idx = orig_idx + 1; idx != orig_idx; idx++) {
+    if(idx == hm->num_buckets) {
+      idx = -1;
+      continue;
+    }
+
+    if((hm->buckets[idx] == NULL && is_free)
+      || (!is_free && hm->cmp_fn(hm->buckets[idx]->fst, key) == 0))
+      return idx;
+  }
+
+  return -1; // no free space or key not found
 }

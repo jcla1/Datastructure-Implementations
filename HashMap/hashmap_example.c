@@ -22,15 +22,14 @@ int main() {
   int val, forty_two;
   hash_map *hm;
 
-  hm = hash_map_create(1, sum_chars, my_cmp);
+  hm = hash_map_create(20, sum_chars, my_cmp);
 
   forty_two = 42;
-  hash_map_set(hm, "hello, world!", &forty_two);
+  hash_map_set(hm, "ad", &forty_two);
 
-  val = *(int*)hash_map_get(hm, "hello, world!");
+  val = *(int*)hash_map_get(hm, "ad");
   printf("Got value: %d\n", val);
 
-  hash_map_delete(hm, "hello, world!");
   hash_map_destroy(hm);
   return 0;
 }

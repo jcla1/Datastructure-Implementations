@@ -86,6 +86,16 @@ void hash_map_delete(hash_map *hm, const void *key) {
   *p = NULL;
 }
 
+void hash_map_traverse(hash_map *hm, traverse_fn_t fn) {
+  pair *p;
+
+  for(int i = 0; i < hm->num_buckets; i++) {
+    p = hm->buckets[i];
+    if(p != NULL)
+      fn(p->fst, p->snd);
+  }
+}
+
 // the is_free parameter states if the cell searched for is allowed to be NULL
 static int hash_map_get_index(const hash_map *hm, const void *key, int is_free) {
   int hash = hm->hash_fn(key);

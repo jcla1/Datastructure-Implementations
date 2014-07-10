@@ -18,6 +18,10 @@ int my_cmp(const void *s1, const void *s2) {
   return strcmp((char*)s1, (char*)s2);
 }
 
+void my_traverse(const void *key, const void *value) {
+  printf("%s -> %d\n", (char*)key, *(int*)value);
+}
+
 int main() {
   int val, forty_two;
   hash_map *hm;
@@ -27,8 +31,7 @@ int main() {
   forty_two = 42;
   hash_map_set(hm, "ad", &forty_two);
 
-  val = *(int*)hash_map_get(hm, "ad");
-  printf("Got value: %d\n", val);
+  hash_map_traverse(hm, my_traverse);
 
   hash_map_destroy(hm);
   return 0;

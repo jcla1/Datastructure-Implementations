@@ -44,7 +44,6 @@ void hash_map_destroy(hash_map *hm) {
 
 void hash_map_set(hash_map *hm, void *key, void *value) {
   pair *p;
-  int hash;
 
   p = (pair*)malloc(sizeof(pair));
   if (p == NULL) {
@@ -55,17 +54,13 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   p->fst = key;
   p->snd = value;
 
-  hash = hm->hash_fn(key);
-
-  hm->buckets[hash % hm->num_buckets] = p;
+  hm->buckets[hash_map_get_index(hm, key)] = p;
 }
 
 void *hash_map_get(const hash_map *hm, void *key) {
   pair *p;
-  int hash;
 
-  hash = hm->hash_fn(key);
-  p = hm->buckets[hash % hm->num_buckets];
+  p = hm->buckets[hash_map_get_index(hm, key)];
 
   if (p == NULL || hm->cmp_fn(p->fst, key) != 0) {
     fprintf(stderr, "[hash_map_get]: key not found in table\n");
@@ -77,11 +72,17 @@ void *hash_map_get(const hash_map *hm, void *key) {
 }
 
 void hash_map_delete(hash_map *hm, void *key) {
-  int hash;
   pair **p;
 
-  hash = hm->hash_fn(key);
-  p = &hm->buckets[hash % hm->num_buckets];
+  p = &hm->buckets[hash_map_get_index(hm, key)];
   pair_destroy(*p);
   *p = NULL;
+}
+
+// Will return the index for the given key.
+// Might use (linear/quadratic) probing, if
+// empty cell is met before key, returns that.
+static int hash_map_get_index(const hash_map *hm, void *key) {
+  int hash = hm->hash_fn(key);
+  return hash % hm->num_buckets;
 }

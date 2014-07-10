@@ -25,4 +25,6 @@ void hash_map_set(hash_map *hm, void *key, void *value);
 void *hash_map_get(const hash_map *hm, void *key);
 void hash_map_delete(hash_map *hm, void *key);
 
+static int hash_map_get_index(const hash_map *hm, void *key);
+
 #endif // DATASTRUCTURES_HASHMAP_HASHMAP_H_

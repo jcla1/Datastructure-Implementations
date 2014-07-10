@@ -2,7 +2,7 @@
 #include <string.h>
 #include "hashmap.h"
 
-int sum_chars(void *str) {
+int sum_chars(const void *str) {
   char *c = (char*)str;
   int sum = 0;
 
@@ -14,7 +14,7 @@ int sum_chars(void *str) {
   return sum;
 }
 
-int my_cmp(void *s1, void *s2) {
+int my_cmp(const void *s1, const void *s2) {
   return strcmp((char*)s1, (char*)s2);
 }
 

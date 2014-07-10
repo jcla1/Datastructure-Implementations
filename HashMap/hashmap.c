@@ -64,7 +64,7 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   hm->buckets[idx] = p;
 }
 
-void *hash_map_get(const hash_map *hm, void *key) {
+void *hash_map_get(const hash_map *hm, const void *key) {
   int idx = hash_map_get_index(hm, key, 0);
 
   if(idx < 0) {
@@ -75,7 +75,7 @@ void *hash_map_get(const hash_map *hm, void *key) {
   return hm->buckets[idx]->snd;
 }
 
-void hash_map_delete(hash_map *hm, void *key) {
+void hash_map_delete(hash_map *hm, const void *key) {
   int idx = hash_map_get_index(hm, key, 0);
 
   if(idx < 0)
@@ -87,7 +87,7 @@ void hash_map_delete(hash_map *hm, void *key) {
 }
 
 // the is_free parameter states if the cell searched for is allowed to be NULL
-static int hash_map_get_index(const hash_map *hm, void *key, int is_free) {
+static int hash_map_get_index(const hash_map *hm, const void *key, int is_free) {
   int hash = hm->hash_fn(key);
   int orig_idx = hash % hm->num_buckets;
 

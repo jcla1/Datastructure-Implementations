@@ -42,7 +42,7 @@ void hash_map_destroy(hash_map *hm) {
   free(hm);
 }
 
-void hash_map_set(hash_map *hm, void *key, void *value) {
+void hash_map_set(hash_map *hm, const void *key, const void *value) {
   int idx;
   pair *p;
 
@@ -62,9 +62,10 @@ void hash_map_set(hash_map *hm, void *key, void *value) {
   }
 
   hm->buckets[idx] = p;
+  hm->ocupied_buckets++;
 }
 
-void *hash_map_get(const hash_map *hm, const void *key) {
+const void *hash_map_get(const hash_map *hm, const void *key) {
   int idx = hash_map_get_index(hm, key, 0);
 
   if(idx < 0) {
@@ -76,24 +77,62 @@ void *hash_map_get(const hash_map *hm, const void *key) {
 }
 
 void hash_map_delete(hash_map *hm, const void *key) {
+  pair **p;
   int idx = hash_map_get_index(hm, key, 0);
 
   if(idx < 0)
     return;
 
-  pair **p = &hm->buckets[idx];
+  p = &hm->buckets[idx];
   pair_destroy(*p);
   *p = NULL;
+
+  hm->ocupied_buckets--;
 }
 
-void hash_map_traverse(hash_map *hm, traverse_fn_t fn) {
+void hash_map_traverse(hash_map *hm, traverse_fn_t fn, void *arg) {
   pair *p;
 
   for(int i = 0; i < hm->num_buckets; i++) {
     p = hm->buckets[i];
     if(p != NULL)
-      fn(p->fst, p->snd);
+      fn(p->fst, p->snd, arg);
   }
+}
+
+// Allocate space for n additional elements
+// Warning: may copy all/rehash.
+void hash_map_resize(hash_map *hm, int n) {
+  hash_map *tmp_hm;
+  int buckets_left;
+
+  // If we've still got enough space, exit early
+  buckets_left = hm->num_buckets - hm->ocupied_buckets;
+  if(buckets_left >= n || n < 0) {
+    return;
+  }
+
+
+  if((tmp_hm = hash_map_create(hm->num_buckets + n - buckets_left, hm->hash_fn, hm->cmp_fn)) == NULL) {
+    fprintf(stderr, "[hash_map_resize]: error allocating temp hash map\n");
+    return;
+  }
+
+  pair *p;
+  for(int i = 0; i < hm->num_buckets; i++) {
+    if((p = hm->buckets[i]) != NULL) {
+      hash_map_set(tmp_hm, p->fst, p->snd);
+    }
+  }
+
+  hm->num_buckets += n - buckets_left;
+  tmp_hm->num_buckets -= n - buckets_left;
+
+  pair **old_buckets = hm->buckets;
+  hm->buckets = tmp_hm->buckets;
+  tmp_hm->buckets = old_buckets;
+
+  hash_map_destroy(tmp_hm);
 }
 
 // the is_free parameter states if the cell searched for is allowed to be NULL
@@ -105,7 +144,6 @@ static int hash_map_get_index(const hash_map *hm, const void *key, int is_free) 
       || (!is_free && hm->cmp_fn(hm->buckets[orig_idx]->fst, key) == 0))
       return orig_idx;
 
-
   for(int idx = orig_idx + 1; idx != orig_idx; idx++) {
     if(idx == hm->num_buckets) {
       idx = -1;
@@ -113,7 +151,7 @@ static int hash_map_get_index(const hash_map *hm, const void *key, int is_free) 
     }
 
     if((hm->buckets[idx] == NULL && is_free)
-      || (!is_free && hm->cmp_fn(hm->buckets[idx]->fst, key) == 0))
+      || (!is_free && hm->buckets[idx] != NULL && hm->cmp_fn(hm->buckets[idx]->fst, key) == 0))
       return idx;
   }
 

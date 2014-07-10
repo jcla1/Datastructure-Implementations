@@ -26,7 +26,7 @@ int main() {
   int val, forty_two;
   hash_map *hm;
 
-  hm = hash_map_create(1, sum_chars, my_cmp);
+  hm = hash_map_create(0, sum_chars, my_cmp);
 
   hash_map_resize(hm, 5);
 
@@ -34,15 +34,12 @@ int main() {
   hash_map_set(hm, "ad", &forty_two);
   hash_map_set(hm, "bc", &forty_two);
 
-  // hash_map_traverse(hm, my_traverse, NULL);
+  hash_map_traverse(hm, my_traverse, NULL);
 
-  // hash_map_delete(hm, "bc");
+  hash_map_delete(hm, "bc");
   hash_map_delete(hm, "dfasddfasd");
 
-  hash_map_resize(hm, 15);
-
   hash_map_set(hm, "zsdf", &forty_two);
-  // hash_map_set(hm, "bcsdfasdf", &forty_two);
 
   hash_map_traverse(hm, my_traverse, NULL);
 

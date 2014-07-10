@@ -8,7 +8,7 @@ void pair_destroy(pair *p) {
 }
 
 hash_map *hash_map_create(int num_buckets, hash_fn_t hash_fn, cmp_fn_t cmp_fn) {
-  hash_map *hm = (hash_map*)malloc(sizeof(hash_map));
+  hash_map *hm = (hash_map*)calloc(1, sizeof(hash_map));
   if (hm == NULL)
     return NULL;
 
@@ -18,7 +18,6 @@ hash_map *hash_map_create(int num_buckets, hash_fn_t hash_fn, cmp_fn_t cmp_fn) {
     return NULL;
   }
 
-  hm->ocupied_buckets = 0;
   hm->num_buckets = num_buckets;
   hm->hash_fn = hash_fn;
   hm->cmp_fn = cmp_fn;
@@ -139,9 +138,9 @@ void hash_map_resize(hash_map *hm, int n) {
 static int hash_map_get_index(const hash_map *hm, const void *key, int is_free) {
   int hash = hm->hash_fn(key);
   int orig_idx = hash % hm->num_buckets;
-
+printf("%s\n", key);
   if((hm->buckets[orig_idx] == NULL && is_free)
-      || (!is_free && hm->cmp_fn(hm->buckets[orig_idx]->fst, key) == 0))
+      || (!is_free && hm->buckets[orig_idx] != NULL && hm->cmp_fn(hm->buckets[orig_idx]->fst, key) == 0))
       return orig_idx;
 
   for(int idx = orig_idx + 1; idx != orig_idx; idx++) {

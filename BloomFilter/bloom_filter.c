@@ -78,7 +78,7 @@ int bloom_filter_check(bloom_filter *bf, void *item, size_t item_len) {
   return 1;
 }
 
-int bloom_filter_merge(bloom_filter *in, bloom_filter *out) {
+int bloom_filter_copy(bloom_filter *in, bloom_filter *out) {
   // Both filters have to have the same size
   if(in->num_bits != out->num_bits)
     return 0;

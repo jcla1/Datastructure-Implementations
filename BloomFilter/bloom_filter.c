@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
+
+#include "murmur3.h"
 #include "bloom_filter.h"
 
-bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn, ...) {
+bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn) {
     va_list funcs;
     bloom_filter *bf;
     // We only allow a number of bits that are
@@ -27,19 +29,6 @@ bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn, ...) {
         return NULL;
     }
 
-    bf->hash_funcs = malloc(sizeof(hash_fn) * num_hash_fn);
-    if(bf->hash_funcs == NULL) {
-        free(bf->bits);
-        free(bf);
-        return NULL;
-    }
-
-    va_start(funcs, num_hash_fn);
-    for(int i = 0; i < num_hash_fn; i++) {
-        bf->hash_funcs[i] = va_arg(funcs, hash_fn);
-    }
-    va_end(funcs);
-
     bf->num_bits = num_bits;
     bf->num_hash_fn = num_hash_fn;
 
@@ -48,42 +37,46 @@ bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn, ...) {
 
 void bloom_filter_destroy(bloom_filter *bf) {
     free(bf->bits);
-    free(bf->hash_funcs);
     free(bf);
 }
 
 void bloom_filter_add(bloom_filter *bf, void *item, size_t item_len) {
-    int *hashes;
+    uint64_t hash1, hash2, combined_hash;
+    uint32_t hash[4];
+    int bit_index;
 
-    hashes = malloc(sizeof(int) * bf->num_hash_fn);
-    if(hashes == NULL) {
-        fprintf(stderr, "[bloom_filter_add]: error allocating hash array.\n");
-        return;
+    MurmurHash3_x64_128(item, item_len, MURMUR_SEED, hash);
+
+    hash1 = (uint64_t)hash[0];
+    hash2 = (uint64_t)hash[2];
+
+    combined_hash = hash1;
+    for(int i = 0; i < bf->num_hash_fn; i++) {
+        bit_index = (combined_hash & UINT64_MAX) % bf->num_bits;
+        bf->bits[bit_index / 8] |= 1 << (bit_index % 8);
+        combined_hash += hash2;
     }
-    bloom_filter_get_hashes(bf, item, item_len, hashes);
-
-    bloom_filter_set_bits(bf, hashes);
 }
 
 int bloom_filter_check(bloom_filter *bf, void *item, size_t item_len) {
-    int *hashes;
+    uint64_t hash1, hash2, combined_hash;
+    uint32_t hash[4];
+    int bit_index;
 
-    hashes = malloc(sizeof(int) * bf->num_hash_fn);
-    if(hashes == NULL) {
-        fprintf(stderr, "[bloom_filter_add]: error allocating hash array.\n");
-        return -1;
-    }
-    bloom_filter_get_hashes(bf, item, item_len, hashes);
+    MurmurHash3_x64_128(item, item_len, MURMUR_SEED, hash);
 
-    return bloom_filter_get_bits(bf, hashes);
-}
+    hash1 = (uint64_t)hash[0];
+    hash2 = (uint64_t)hash[2];
 
-static void bloom_filter_set_bits(bloom_filter *bf, int *hashes) {
-    div_t idx;
+    combined_hash = hash1;
     for(int i = 0; i < bf->num_hash_fn; i++) {
-        idx = div(hashes[i], bf->num_bits);
-        bf->bits[idx.quot] |= 1 << idx.rem;
+        bit_index = (combined_hash & UINT64_MAX) % bf->num_bits;
+        if((bf->bits[bit_index / 8] & 1 << (bit_index % 8)) == 0)
+          return 0;
+        combined_hash += hash2;
     }
+
+    return 1;
 }
 
 static int bloom_filter_get_bits(bloom_filter *bf, int *hashes) {
@@ -94,10 +87,4 @@ static int bloom_filter_get_bits(bloom_filter *bf, int *hashes) {
             return 0;
     }
     return 1;
-}
-
-static void bloom_filter_get_hashes(bloom_filter *bf, void *item, size_t item_len, int *hashes) {
-    for (int i = 0; i < bf->num_hash_fn; i++) {
-        hashes[i] = bf->hash_funcs[i](item, item_len);
-    }
 }

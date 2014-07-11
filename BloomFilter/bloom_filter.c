@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <math.h>
 #include "bloom_filter.h"
 
 bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn, ...) {
@@ -59,14 +60,43 @@ void bloom_filter_add(bloom_filter *bf, void *item, size_t item_len) {
         fprintf(stderr, "[bloom_filter_add]: error allocating hash array.\n");
         return;
     }
-    bloom_filter_set_hashes(bf, item, item_len, hashes);
+    bloom_filter_get_hashes(bf, item, item_len, hashes);
+
+    bloom_filter_set_bits(bf, hashes);
 }
 
 int bloom_filter_check(bloom_filter *bf, void *item, size_t item_len) {
-    return 0;
+    int *hashes;
+
+    hashes = malloc(sizeof(int) * bf->num_hash_fn);
+    if(hashes == NULL) {
+        fprintf(stderr, "[bloom_filter_add]: error allocating hash array.\n");
+        return -1;
+    }
+    bloom_filter_get_hashes(bf, item, item_len, hashes);
+
+    return bloom_filter_get_bits(bf, hashes);
 }
 
-static void bloom_filter_set_hashes(bloom_filter *bf, void *item, size_t item_len, int *hashes) {
+static void bloom_filter_set_bits(bloom_filter *bf, int *hashes) {
+    div_t idx;
+    for(int i = 0; i < bf->num_hash_fn; i++) {
+        idx = div(hashes[i], bf->num_bits);
+        bf->bits[idx.quot] |= 1 << idx.rem;
+    }
+}
+
+static int bloom_filter_get_bits(bloom_filter *bf, int *hashes) {
+    div_t idx;
+    for(int i = 0; i < bf->num_hash_fn; i++) {
+        idx = div(hashes[i], bf->num_bits);
+        if((bf->bits[idx.quot] & (1 << idx.rem)) == 0)
+            return 0;
+    }
+    return 1;
+}
+
+static void bloom_filter_get_hashes(bloom_filter *bf, void *item, size_t item_len, int *hashes) {
     for (int i = 0; i < bf->num_hash_fn; i++) {
         hashes[i] = bf->hash_funcs[i](item, item_len);
     }

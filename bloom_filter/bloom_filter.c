@@ -4,14 +4,11 @@
 #include <math.h>
 
 #include "murmur3.h"
+#include "bit_array/bit_array.h"
 #include "bloom_filter.h"
 
 bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn) {
   bloom_filter *bf;
-  // We only allow a number of bits that are
-  // a multiple of 8 (because char == 8 bits)
-  if((num_bits & 7) != 0)
-    return NULL;
 
   // The bloom filter is of no use, when there
   // are no hash functions.
@@ -22,20 +19,19 @@ bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn) {
   if(bf == NULL)
     return NULL;
 
-  bf->bits = calloc(num_bits / 8, 1);
-  if(bf->bits == NULL) {
+  bf->ba = bit_array_create(num_bits);
+  if(bf->ba == NULL) {
     free(bf);
     return NULL;
   }
 
-  bf->num_bits = num_bits;
   bf->num_hash_fn = num_hash_fn;
 
   return bf;
 }
 
 void bloom_filter_destroy(bloom_filter *bf) {
-  free(bf->bits);
+  bit_array_destroy(bf->ba);
   free(bf);
 }
 
@@ -51,8 +47,8 @@ void bloom_filter_add(bloom_filter *bf, void *item, size_t item_len) {
 
   combined_hash = hash1;
   for(int i = 0; i < bf->num_hash_fn; i++) {
-    bit_index = (combined_hash & UINT64_MAX) % bf->num_bits;
-    bf->bits[bit_index / 8] |= 1 << (bit_index % 8);
+    bit_index = (combined_hash & UINT64_MAX) % bf->ba->num_bits;
+    bit_array_set(bf->ba, bit_index);
     combined_hash += hash2;
   }
 }
@@ -69,8 +65,8 @@ int bloom_filter_check(bloom_filter *bf, void *item, size_t item_len) {
 
   combined_hash = hash1;
   for(int i = 0; i < bf->num_hash_fn; i++) {
-    bit_index = (combined_hash & UINT64_MAX) % bf->num_bits;
-    if((bf->bits[bit_index / 8] & 1 << (bit_index % 8)) == 0)
+    bit_index = (combined_hash & UINT64_MAX) % bf->ba->num_bits;
+    if(bit_array_get(bf->ba, bit_index) == 0)
       return 0;
     combined_hash += hash2;
   }
@@ -79,16 +75,9 @@ int bloom_filter_check(bloom_filter *bf, void *item, size_t item_len) {
 }
 
 int bloom_filter_copy(bloom_filter *in, bloom_filter *out) {
-  // Both filters have to have the same size
-  if(in->num_bits != out->num_bits)
-    return 0;
-
   // Both filters should to have the same number of hash functions
   if(in->num_hash_fn != out->num_hash_fn)
     return 0;
 
-  for(int i = in->num_bits >> 3; i >= 0; i--)
-    out->bits[i] |= in->bits[i];
-
-  return 1;
+  return bit_array_copy(in->ba, out->ba);
 }

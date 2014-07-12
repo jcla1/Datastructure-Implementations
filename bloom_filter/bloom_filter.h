@@ -1,3 +1,5 @@
+#include "bit_array/bit_array.h"
+
 #ifndef DATASTRUCTURES_BLOOM_FILTER_H_
 #define DATASTRUCTURES_BLOOM_FILTER_H_
 
@@ -5,9 +7,8 @@
 
 typedef struct bloom_filter bloom_filter;
 struct bloom_filter {
-    int num_bits;
     int num_hash_fn;
-    unsigned char *bits;
+    bit_array *ba;
 };
 
 bloom_filter *bloom_filter_create(int num_bits, int num_hash_fn);

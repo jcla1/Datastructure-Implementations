@@ -43,3 +43,14 @@ int bit_array_unset(bit_array *ba, uint32_t index) {
 
   return 0;
 }
+
+int bit_array_copy(bit_array *in, bit_array *out) {
+  // Both arrays have to have the same size
+  if(in->num_bits != out->num_bits)
+    return 0;
+
+  for(int i = in->num_bits >> 3; i >= 0; i--)
+    out->bits[i] |= in->bits[i];
+
+  return 1;
+}

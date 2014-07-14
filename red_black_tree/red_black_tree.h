@@ -21,5 +21,9 @@ struct rb_tree {
 rb_tree *rb_tree_create(rb_cmp_fn cmp);
 void rb_tree_destroy(rb_tree *tree);
 void *rb_tree_search(rb_tree *tree, void *val);
+void rb_tree_insert(rb_tree *tree, void *value);
+void *rb_tree_delete(rb_tree *tree, void *val);
+
+static rb_tree_node *rb_tree_new_node(void *value);
 
 #endif // DATASTRUCTURES_RED_BLACK_TREE_H_

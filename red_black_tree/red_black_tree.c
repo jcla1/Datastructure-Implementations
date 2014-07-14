@@ -49,17 +49,17 @@ void *rb_tree_search(rb_tree *tree, void *val) {
 }
 
 void rb_tree_insert(rb_tree *tree, void *value) {
-  rb_tree_node *cur, *prev, *new_node, *y, *x;
+  rb_tree_node *cur, *prev, *y, *x;
   int comp_res;
 
-  if((new_node = rb_tree_new_node(value)) == NULL) {
+  if((x = rb_tree_new_node(value)) == NULL) {
     fprintf(stderr, "[rb_tree_insert]: error allocating memory for new node.\n");
     return;
   }
 
   // Normal BST insert ---
   if(tree->root == NULL) { // tree is empty
-    tree->root = new_node;
+    tree->root = x;
     tree->root->color = BLACK;
     return;
   }
@@ -77,20 +77,18 @@ void rb_tree_insert(rb_tree *tree, void *value) {
       cur = cur->right;
   }
 
-  new_node->parent = prev;
+  x->parent = prev;
 
   if(comp_res == 0)
-    prev->left = new_node;
+    prev->left = x;
   else
-    prev->right = new_node;
+    prev->right = x;
   // End normal BST insert
 
-  x = new_node;
-
   while(x != tree->root && x->parent->color == RED) {
-    // printf("Running loop with value: %d\n", *(int*)x->value);
     if(x->parent == x->parent->parent->left) {
       y = x->parent->parent->left;
+
       if (y->color == RED) {
         x->parent->color = BLACK;
         y->color = BLACK;
@@ -101,13 +99,14 @@ void rb_tree_insert(rb_tree *tree, void *value) {
           x = x->parent;
           rb_tree_left_rotate(tree, x);
         }
+
         x->parent->color = BLACK;
         x->parent->parent->color = RED;
         rb_tree_right_rotate(tree, x->parent->parent);
       }
     } else {
       y = x->parent->parent->left;
-      // printf("here!\n");
+
       if (y != NULL && y->color == RED) {
         x->parent->color = BLACK;
         y->color = BLACK;
@@ -118,6 +117,7 @@ void rb_tree_insert(rb_tree *tree, void *value) {
           x = x->parent;
           rb_tree_right_rotate(tree, x);
         }
+
         x->parent->color = BLACK;
         x->parent->parent->color = RED;
         rb_tree_left_rotate(tree, x->parent->parent);
@@ -161,7 +161,6 @@ static void rb_tree_sub_traverse(rb_tree_node *node, traverse_fn f) {
 }
 
 static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
-  printf("here!\n");
   rb_tree_node *x;
   x = y->left;
 
@@ -181,7 +180,6 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
 }
 
 static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x) {
-  printf("here!\n");
   rb_tree_node *y;
   y = x->right;
 

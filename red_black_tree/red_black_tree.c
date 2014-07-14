@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "red_black_tree.h"
 
@@ -7,7 +8,18 @@ rb_tree *rb_tree_create(rb_cmp_fn cmp) {
 }
 
 void rb_tree_destroy(rb_tree *tree) {
+  if(tree->root != NULL)
+    rb_tree_destroy_nodes(tree->root);
+  free(tree);
+}
 
+static void rb_tree_destroy_nodes(rb_tree_node *node) {
+  if(node->left != NULL)
+    rb_tree_destroy_nodes(node->left)
+  if(node->right != NULL)
+    rb_tree_destroy_nodes(node->right)
+
+  free(node);
 }
 
 void *rb_tree_search(rb_tree *tree, void *val) {

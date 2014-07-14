@@ -6,7 +6,7 @@
 rb_tree *rb_tree_create(rb_cmp_fn cmp) {
   rb_tree *tree;
 
-  if((tree = calloc(1, sizeof(rb_tree)) == NULL))
+  if((tree = calloc(1, sizeof(rb_tree))) == NULL)
     return NULL;
 
   tree->cmp = cmp;
@@ -22,9 +22,9 @@ void rb_tree_destroy(rb_tree *tree) {
 
 static void rb_tree_destroy_nodes(rb_tree_node *node) {
   if(node->left != NULL)
-    rb_tree_destroy_nodes(node->left)
+    rb_tree_destroy_nodes(node->left);
   if(node->right != NULL)
-    rb_tree_destroy_nodes(node->right)
+    rb_tree_destroy_nodes(node->right);
 
   free(node);
 }
@@ -49,7 +49,7 @@ void *rb_tree_search(rb_tree *tree, void *val) {
 }
 
 void rb_tree_insert(rb_tree *tree, void *value) {
-  rb_tree_node *cur, *prev, new_node;
+  rb_tree_node *cur, *prev, *new_node, *y, *x;
   int comp_res;
 
   if((new_node = rb_tree_new_node(value)) == NULL) {
@@ -69,22 +69,63 @@ void rb_tree_insert(rb_tree *tree, void *value) {
 
   while(cur != NULL) {
     prev = cur;
-    comp_res = tree->cmp(cur, value);
+    comp_res = tree->cmp(cur->value, value);
 
-    if(comp_res < 0)
+    if(comp_res == 0)
       cur = cur->left;
     else
-      cur = cur->right
+      cur = cur->right;
   }
 
   new_node->parent = prev;
 
-  if(comp_res < 0)
+  if(comp_res == 0)
     prev->left = new_node;
   else
     prev->right = new_node;
   // End normal BST insert
 
+  x = new_node;
+
+  while(x != tree->root && x->parent->color == RED) {
+    // printf("Running loop with value: %d\n", *(int*)x->value);
+    if(x->parent == x->parent->parent->left) {
+      y = x->parent->parent->left;
+      if (y->color == RED) {
+        x->parent->color = BLACK;
+        y->color = BLACK;
+        x->parent->parent->color = RED;
+        x = x->parent->parent;
+      } else {
+        if(x == x->parent->right) {
+          x = x->parent;
+          rb_tree_left_rotate(tree, x);
+        }
+        x->parent->color = BLACK;
+        x->parent->parent->color = RED;
+        rb_tree_right_rotate(tree, x->parent->parent);
+      }
+    } else {
+      y = x->parent->parent->left;
+      // printf("here!\n");
+      if (y != NULL && y->color == RED) {
+        x->parent->color = BLACK;
+        y->color = BLACK;
+        x->parent->parent->color = RED;
+        x = x->parent->parent;
+      } else {
+        if(x == x->parent->left) {
+          x = x->parent;
+          rb_tree_right_rotate(tree, x);
+        }
+        x->parent->color = BLACK;
+        x->parent->parent->color = RED;
+        rb_tree_left_rotate(tree, x->parent->parent);
+      }
+    }
+  }
+
+  tree->root->color = BLACK;
 }
 
 static rb_tree_node *rb_tree_new_node(void *value) {
@@ -104,7 +145,23 @@ void *rb_tree_delete(rb_tree *tree, void *val) {
   return value;
 }
 
+void rb_tree_traverse_inorder(rb_tree *tree, traverse_fn f) {
+  if(tree->root != NULL)
+    rb_tree_sub_traverse(tree->root, f);
+}
+
+static void rb_tree_sub_traverse(rb_tree_node *node, traverse_fn f) {
+  if(node->left != NULL)
+    rb_tree_sub_traverse(node->left, f);
+
+  f(node->value);
+
+  if(node->right != NULL)
+    rb_tree_sub_traverse(node->right, f);
+}
+
 static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
+  printf("here!\n");
   rb_tree_node *x;
   x = y->left;
 
@@ -124,20 +181,23 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
 }
 
 static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x) {
+  printf("here!\n");
   rb_tree_node *y;
   y = x->right;
 
   x->right = y->left;
-  if(x->right != NULL)
-    x->left->parent = x;
+  if(y->left != NULL)
+    y->left->parent = x;
 
-  if(x == tree->root)
+  y->parent = x->parent;
+
+  if(x->parent == NULL)
     tree->root = y;
   else if(x == x->parent->left)
     x->parent->left = y;
   else
     x->parent->right = y;
 
-  x->parent = y;
   y->left = x;
+  x->parent = y;
 }

@@ -25,5 +25,6 @@ void rb_tree_insert(rb_tree *tree, void *value);
 void *rb_tree_delete(rb_tree *tree, void *val);
 
 static rb_tree_node *rb_tree_new_node(void *value);
+static void rb_tree_destroy_nodes(rb_tree_node *node);
 
 #endif // DATASTRUCTURES_RED_BLACK_TREE_H_

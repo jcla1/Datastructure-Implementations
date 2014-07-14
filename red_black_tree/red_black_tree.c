@@ -4,7 +4,14 @@
 #include "red_black_tree.h"
 
 rb_tree *rb_tree_create(rb_cmp_fn cmp) {
+  rb_tree *tree;
 
+  if((tree = calloc(1, sizeof(rb_tree)) == NULL))
+    return NULL;
+
+  tree->cmp = cmp;
+
+  return tree;
 }
 
 void rb_tree_destroy(rb_tree *tree) {
@@ -42,19 +49,41 @@ void *rb_tree_search(rb_tree *tree, void *val) {
 }
 
 void rb_tree_insert(rb_tree *tree, void *value) {
-  rb_tree_node *cur;
+  rb_tree_node *cur, *prev, new_node;
   int comp_res;
 
-  cur = tree->root;
-
-  if(cur == NULL) { // tree is empty
-    if((tree->root = rb_tree_new_node(value)) == NULL) {
-      fprintf(stderr, "[rb_tree_insert]: error allocating memory for new node.\n");
-    } else {
-      tree->root->color = BLACK;
-    }
+  if((new_node = rb_tree_new_node(value)) == NULL) {
+    fprintf(stderr, "[rb_tree_insert]: error allocating memory for new node.\n");
     return;
   }
+
+  // Normal BST insert ---
+  if(tree->root == NULL) { // tree is empty
+    tree->root = new_node;
+    tree->root->color = BLACK;
+    return;
+  }
+
+  prev = NULL;
+  cur = tree->root;
+
+  while(cur != NULL) {
+    prev = cur;
+    comp_res = tree->cmp(cur, value);
+
+    if(comp_res < 0)
+      cur = cur->left;
+    else
+      cur = cur->right
+  }
+
+  new_node->parent = prev;
+
+  if(comp_res < 0)
+    prev->left = new_node;
+  else
+    prev->right = new_node;
+  // End normal BST insert
 
 }
 

@@ -72,7 +72,7 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
     y->left->parent = y;
 
   if(y == tree->root)
-    tree->root = x
+    tree->root = x;
   else if(y == y->parent->left)
     y->parent->left = x;
   else
@@ -80,4 +80,23 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
 
   y->parent = x;
   x->right = y;
+}
+
+static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x) {
+  rb_tree_node *y;
+  y = x->right;
+
+  x->right = y->left;
+  if(x->right != NULL)
+    x->left->parent = x;
+
+  if(x == tree->root)
+    tree->root = y;
+  else if(x == x->parent->left)
+    x->parent->left = y;
+  else
+    x->parent->right = y;
+
+  x->parent = y;
+  y->left = x;
 }

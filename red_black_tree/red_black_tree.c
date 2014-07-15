@@ -36,7 +36,7 @@ void *rb_tree_search(rb_tree *tree, void *val) {
   return NULL;
 }
 
-static rb_tree_node *rb_tree_search_node(rb_tree *tree, void *val) {
+rb_tree_node *rb_tree_search_node(rb_tree *tree, void *val) {
   rb_tree_node *cur;
   int comp_res;
 
@@ -145,45 +145,6 @@ static rb_tree_node *rb_tree_new_node(void *value) {
   node->color = RED;
 
   return node;
-}
-
-void *rb_tree_delete(rb_tree *tree, void *val) {
-  rb_tree_node *x, *y, *z;
-  void *value;
-
-  if((z = rb_tree_search_node(tree, val)) == NULL)
-    return NULL; // node not present
-  else
-    value = z->value;
-
-  y = ((z->left == NULL) || (z->right == NULL)) ? z : rb_successor_node(z);
-  x = (y->left == NULL) ? y->right : y->left;
-  printf("%p\n", x);
-  if(tree->root == (x->parent = y->parent)) {
-    tree->root->left = x;
-  } else {
-    if(y == y->parent->left) {
-      y->parent->left = x;
-    } else {
-      y->parent->right = x;
-    }
-  }
-
-  if(y != z) {
-    y->left = x->left;
-    y->right = x->right;
-    y->parent = x->parent;
-    y->color = x->color;
-    z->left->parent = z->right->parent = y;
-    if(z == z->parent->left)
-      z->parent->left = y;
-    else
-      z->parent->right = y;
-
-    // free here!
-  }
-
-  return value;
 }
 
 rb_tree_node *rb_successor_node(rb_tree_node *x) {

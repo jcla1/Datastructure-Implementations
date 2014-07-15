@@ -6,7 +6,7 @@ int compare_ints (void *a, void *b) {
 }
 
 void my_trav(void *i1) {
-  printf("%d\n", *(int*)i1);
+  printf("%d ", *(int*)i1);
 }
 
 int main() {
@@ -17,35 +17,27 @@ int main() {
       return -1;
     }
 
-    int nums[] = {7, 6, 5, 4, 3, 2, 1};
+    int nums[] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
-    for (int i = 0; i < 7; i++) {
-      printf("Inserting: %d.\n", nums[i]);
+    for (int i = 0; i < 10; i++) {
       rb_tree_insert(tree, &nums[i]);
-
-
-      rb_tree_node *cur = tree->root;
-      while(cur != NULL) {
-        printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
-        cur = cur->left;
-      }
-
-      printf("\n\n");
     }
 
-    for (int i = 0; i < 7; i++) {
-      printf("Removing: %d.\n", nums[i]);
-      rb_tree_delete(tree, &nums[i]);
+    // for (int i = 0; i < 10; i++) {
+    //   printf("Removing: %d.\n", nums[i]);
+    //   rb_tree_delete(tree, &nums[i]);
 
+    //   rb_tree_traverse_inorder(tree, my_trav);
+    //   printf("\n");
 
-      rb_tree_node *cur = tree->root;
-      while(cur != NULL) {
-        printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
-        cur = cur->left;
-      }
+    //   rb_tree_node *cur = tree->root;
+    //   while(cur != NULL) {
+    //     printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
+    //     cur = cur->left;
+    //   }
 
-      printf("\n\n");
-    }
+    //   printf("\n\n");
+    // }
 
     return 0;
 }

@@ -87,9 +87,9 @@ void rb_tree_insert(rb_tree *tree, void *value) {
 
   while(x != tree->root && x->parent->color == RED) {
     if(x->parent == x->parent->parent->left) {
-      y = x->parent->parent->left;
+      y = x->parent->parent->right;
 
-      if (y->color == RED) {
+      if (y != NULL && y->color == RED) {
         x->parent->color = BLACK;
         y->color = BLACK;
         x->parent->parent->color = RED;
@@ -168,6 +168,8 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
   if(y->left != NULL)
     y->left->parent = y;
 
+  x->parent = y->parent;
+
   if(y == tree->root)
     tree->root = x;
   else if(y == y->parent->left)
@@ -175,8 +177,8 @@ static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
   else
     y->parent->right = x;
 
-  y->parent = x;
   x->right = y;
+  y->parent = x;
 }
 
 static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x) {

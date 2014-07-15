@@ -16,20 +16,27 @@ rb_tree *rb_tree_create(rb_cmp_fn cmp) {
 
 void rb_tree_destroy(rb_tree *tree) {
   if(tree->root != NULL)
-    rb_tree_destroy_nodes(tree->root);
+    rb_destroy_nodes(tree->root);
   free(tree);
 }
 
-static void rb_tree_destroy_nodes(rb_tree_node *node) {
+static void rb_destroy_nodes(rb_tree_node *node) {
   if(node->left != NULL)
-    rb_tree_destroy_nodes(node->left);
+    rb_destroy_nodes(node->left);
   if(node->right != NULL)
-    rb_tree_destroy_nodes(node->right);
+    rb_destroy_nodes(node->right);
 
   free(node);
 }
 
 void *rb_tree_search(rb_tree *tree, void *val) {
+  rb_tree_node *node;
+  if((node = rb_tree_search_node(tree, val)) != NULL)
+    return node->value;
+  return NULL;
+}
+
+static rb_tree_node *rb_tree_search_node(rb_tree *tree, void *val) {
   rb_tree_node *cur;
   int comp_res;
 
@@ -38,7 +45,7 @@ void *rb_tree_search(rb_tree *tree, void *val) {
     comp_res = tree->cmp(cur->value, val);
 
     if(comp_res == 0)
-      return cur->value;
+      return cur;
     else if(comp_res < 0)
       cur = cur->left;
     else
@@ -141,8 +148,70 @@ static rb_tree_node *rb_tree_new_node(void *value) {
 }
 
 void *rb_tree_delete(rb_tree *tree, void *val) {
+  rb_tree_node *x, *y, *z;
   void *value;
+
+  if((z = rb_tree_search_node(tree, val)) == NULL)
+    return NULL; // node not present
+  else
+    value = z->value;
+
+  y = ((z->left == NULL) || (z->right == NULL)) ? z : rb_successor_node(z);
+  x = (y->left == NULL) ? y->right : y->left;
+  printf("%p\n", x);
+  if(tree->root == (x->parent = y->parent)) {
+    tree->root->left = x;
+  } else {
+    if(y == y->parent->left) {
+      y->parent->left = x;
+    } else {
+      y->parent->right = x;
+    }
+  }
+
+  if(y != z) {
+    y->left = x->left;
+    y->right = x->right;
+    y->parent = x->parent;
+    y->color = x->color;
+    z->left->parent = z->right->parent = y;
+    if(z == z->parent->left)
+      z->parent->left = y;
+    else
+      z->parent->right = y;
+
+    // free here!
+  }
+
   return value;
+}
+
+rb_tree_node *rb_successor_node(rb_tree_node *x) {
+  rb_tree_node *y;
+
+  if(x->right != NULL)
+    return rb_minimum_node(x->right);
+
+  y = x->parent;
+  while(y != NULL && x == y->right) {
+    x = y;
+    y = y->parent;
+  }
+  return y;
+}
+
+rb_tree_node *rb_minimum_node(rb_tree_node *node) {
+  while(node->left != NULL)
+    node = node->left;
+
+  return node;
+}
+
+rb_tree_node *rb_maximum_node(rb_tree_node *node) {
+  while(node->right != NULL)
+    node = node->right;
+
+  return node;
 }
 
 void rb_tree_traverse_inorder(rb_tree *tree, traverse_fn f) {

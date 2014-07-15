@@ -26,8 +26,14 @@ void rb_tree_insert(rb_tree *tree, void *value);
 void *rb_tree_delete(rb_tree *tree, void *val);
 void rb_tree_traverse_inorder(rb_tree *tree, traverse_fn f);
 
+rb_tree_node *rb_minimum_node(rb_tree_node *node);
+rb_tree_node *rb_maximum_node(rb_tree_node *node);
+rb_tree_node *rb_successor_node(rb_tree_node *x);
+
 static rb_tree_node *rb_tree_new_node(void *value);
-static void rb_tree_destroy_nodes(rb_tree_node *node);
+static void rb_destroy_nodes(rb_tree_node *node);
+
+static rb_tree_node *rb_tree_search_node(rb_tree *tree, void *val);
 
 static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x);
 static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y);

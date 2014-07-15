@@ -33,12 +33,18 @@ int main() {
       printf("\n\n");
     }
 
-    // rb_tree_traverse_inorder(tree, my_trav);
+    for (int i = 0; i < 7; i++) {
+      printf("Removing: %d.\n", nums[i]);
+      rb_tree_delete(tree, &nums[i]);
 
-    rb_tree_node *cur = tree->root;
-    while(cur != NULL) {
-      printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
-      cur = cur->left;
+
+      rb_tree_node *cur = tree->root;
+      while(cur != NULL) {
+        printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
+        cur = cur->left;
+      }
+
+      printf("\n\n");
     }
 
     return 0;

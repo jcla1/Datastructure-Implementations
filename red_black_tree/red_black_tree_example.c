@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#include "bst/bst.h"
 #include "red_black_tree.h"
 
 int compare_ints (void *a, void *b) {
@@ -27,7 +29,7 @@ int main() {
     //   printf("Removing: %d.\n", nums[i]);
     //   rb_tree_delete(tree, &nums[i]);
 
-    //   rb_tree_traverse_inorder(tree, my_trav);
+    //   bst_traverse_inorder(tree, my_trav);
     //   printf("\n");
 
     //   rb_tree_node *cur = tree->root;

@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "bst/bst.h"
 #include "red_black_tree.h"
 
-rb_tree *rb_tree_create(rb_cmp_fn cmp) {
+rb_tree *rb_tree_create(tree_cmp_fn cmp) {
   rb_tree *tree;
 
   if((tree = calloc(1, sizeof(rb_tree))) == NULL)
@@ -29,34 +30,15 @@ static void rb_destroy_nodes(rb_tree_node *node) {
   free(node);
 }
 
-void *rb_tree_search(rb_tree *tree, void *val) {
+void *rb_tree_search(rb_tree *tree, void *value) {
   rb_tree_node *node;
-  if((node = rb_tree_search_node(tree, val)) != NULL)
-    return node->value;
-  return NULL;
-}
-
-rb_tree_node *rb_tree_search_node(rb_tree *tree, void *val) {
-  rb_tree_node *cur;
-  int comp_res;
-
-  cur = tree->root;
-  while(cur != NULL) {
-    comp_res = tree->cmp(cur->value, val);
-
-    if(comp_res == 0)
-      return cur;
-    else if(comp_res < 0)
-      cur = cur->left;
-    else
-      cur = cur->right;
-  }
-
-  return NULL; // value not present
+  if((node = (rb_tree_node*)bst_search_node((bst*)tree, value)) == NULL)
+    return NULL;
+  return node->value;
 }
 
 void rb_tree_insert(rb_tree *tree, void *value) {
-  rb_tree_node *cur, *prev, *y, *x;
+  rb_tree_node *y, *x;
   int comp_res;
 
   if((x = rb_tree_new_node(value)) == NULL) {
@@ -64,33 +46,9 @@ void rb_tree_insert(rb_tree *tree, void *value) {
     return;
   }
 
-  // Normal BST insert ---
-  if(tree->root == NULL) { // tree is empty
-    tree->root = x;
-    tree->root->color = BLACK;
-    return;
-  }
-
-  prev = NULL;
-  cur = tree->root;
-
-  while(cur != NULL) {
-    prev = cur;
-    comp_res = tree->cmp(cur->value, value);
-
-    if(comp_res == 0)
-      cur = cur->left;
-    else
-      cur = cur->right;
-  }
-
-  x->parent = prev;
-
-  if(comp_res == 0)
-    prev->left = x;
-  else
-    prev->right = x;
-  // End normal BST insert
+  bst_insert_node((bst*)tree, (tree_node*)x);
+  if(tree->root == x)
+    x->color = BLACK;
 
   while(x != tree->root && x->parent->color == RED) {
     if(x->parent == x->parent->parent->left) {
@@ -173,21 +131,6 @@ rb_tree_node *rb_maximum_node(rb_tree_node *node) {
     node = node->right;
 
   return node;
-}
-
-void rb_tree_traverse_inorder(rb_tree *tree, traverse_fn f) {
-  if(tree->root != NULL)
-    rb_tree_sub_traverse(tree->root, f);
-}
-
-static void rb_tree_sub_traverse(rb_tree_node *node, traverse_fn f) {
-  if(node->left != NULL)
-    rb_tree_sub_traverse(node->left, f);
-
-  f(node->value);
-
-  if(node->right != NULL)
-    rb_tree_sub_traverse(node->right, f);
 }
 
 static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {

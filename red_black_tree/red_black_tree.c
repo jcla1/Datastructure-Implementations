@@ -62,12 +62,12 @@ void rb_tree_insert(rb_tree *tree, void *value) {
       } else {
         if(x == x->parent->right) {
           x = x->parent;
-          rb_tree_left_rotate(tree, x);
+          bst_left_rotate((bst*)tree, (tree_node*)x);
         }
 
         x->parent->color = BLACK;
         x->parent->parent->color = RED;
-        rb_tree_right_rotate(tree, x->parent->parent);
+        bst_right_rotate((bst*)tree, (tree_node*)x->parent->parent);
       }
     } else {
       y = x->parent->parent->left;
@@ -80,12 +80,12 @@ void rb_tree_insert(rb_tree *tree, void *value) {
       } else {
         if(x == x->parent->left) {
           x = x->parent;
-          rb_tree_right_rotate(tree, x);
+          bst_right_rotate((bst*)tree, (tree_node*)x);
         }
 
         x->parent->color = BLACK;
         x->parent->parent->color = RED;
-        rb_tree_left_rotate(tree, x->parent->parent);
+        bst_left_rotate((bst*)tree, (tree_node*)x->parent->parent);
       }
     }
   }
@@ -103,74 +103,4 @@ static rb_tree_node *rb_tree_new_node(void *value) {
   node->color = RED;
 
   return node;
-}
-
-rb_tree_node *rb_successor_node(rb_tree_node *x) {
-  rb_tree_node *y;
-
-  if(x->right != NULL)
-    return rb_minimum_node(x->right);
-
-  y = x->parent;
-  while(y != NULL && x == y->right) {
-    x = y;
-    y = y->parent;
-  }
-  return y;
-}
-
-rb_tree_node *rb_minimum_node(rb_tree_node *node) {
-  while(node->left != NULL)
-    node = node->left;
-
-  return node;
-}
-
-rb_tree_node *rb_maximum_node(rb_tree_node *node) {
-  while(node->right != NULL)
-    node = node->right;
-
-  return node;
-}
-
-static void rb_tree_right_rotate(rb_tree *tree, rb_tree_node *y) {
-  rb_tree_node *x;
-  x = y->left;
-
-  y->left = x->right;
-  if(y->left != NULL)
-    y->left->parent = y;
-
-  x->parent = y->parent;
-
-  if(y == tree->root)
-    tree->root = x;
-  else if(y == y->parent->left)
-    y->parent->left = x;
-  else
-    y->parent->right = x;
-
-  x->right = y;
-  y->parent = x;
-}
-
-static void rb_tree_left_rotate(rb_tree *tree, rb_tree_node *x) {
-  rb_tree_node *y;
-  y = x->right;
-
-  x->right = y->left;
-  if(y->left != NULL)
-    y->left->parent = x;
-
-  y->parent = x->parent;
-
-  if(x->parent == NULL)
-    tree->root = y;
-  else if(x == x->parent->left)
-    x->parent->left = y;
-  else
-    x->parent->right = y;
-
-  y->left = x;
-  x->parent = y;
 }

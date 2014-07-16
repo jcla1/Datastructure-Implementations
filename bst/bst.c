@@ -51,6 +51,48 @@ void bst_insert_node(bst *tree, tree_node *node) {
         prev->right = node;
 }
 
+tree_node *bst_predecessor(tree_node *x) {
+  tree_node *y;
+
+  if(x->left != NULL)
+    return bst_maximum(x->left);
+
+  y = x->parent;
+  while(y != NULL && x == y->left) {
+    x = y;
+    y = y->parent;
+  }
+  return y;
+}
+
+tree_node *bst_successor(tree_node *x) {
+  tree_node *y;
+
+  if(x->right != NULL)
+    return bst_minimum(x->right);
+
+  y = x->parent;
+  while(y != NULL && x == y->right) {
+    x = y;
+    y = y->parent;
+  }
+  return y;
+}
+
+tree_node *bst_minimum(tree_node *node) {
+  while(node->left != NULL)
+    node = node->left;
+
+  return node;
+}
+
+tree_node *bst_maximum(tree_node *node) {
+  while(node->right != NULL)
+    node = node->right;
+
+  return node;
+}
+
 void bst_traverse(bst *tree, tree_traverse_fn fn) {
     if(tree->root != NULL)
         return;
@@ -66,4 +108,47 @@ static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn) {
 
     if(node->right != NULL)
         bst_sub_traverse(node->right, fn);
+}
+
+void bst_left_rotate(bst *tree, tree_node *x) {
+  tree_node *y;
+  y = x->right;
+
+  x->right = y->left;
+  if(y->left != NULL)
+    y->left->parent = x;
+
+  y->parent = x->parent;
+
+  if(x->parent == NULL)
+    tree->root = y;
+  else if(x == x->parent->left)
+    x->parent->left = y;
+  else
+    x->parent->right = y;
+
+  y->left = x;
+  x->parent = y;
+}
+
+
+void bst_right_rotate(bst *tree, tree_node *y) {
+  tree_node *x;
+  x = y->left;
+
+  y->left = x->right;
+  if(y->left != NULL)
+    y->left->parent = y;
+
+  x->parent = y->parent;
+
+  if(y == tree->root)
+    tree->root = x;
+  else if(y == y->parent->left)
+    y->parent->left = x;
+  else
+    y->parent->right = x;
+
+  x->right = y;
+  y->parent = x;
 }

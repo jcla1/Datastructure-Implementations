@@ -22,6 +22,7 @@ static void bst_subtree_destroy(tree_node *node);
 
 tree_node *bst_search_node(bst *tree, void *value);
 void bst_insert_node(bst *tree, tree_node *node);
+void bst_replace_node(bst *tree, tree_node *u, tree_node *v);
 
 tree_node *bst_minimum(tree_node *node);
 tree_node *bst_maximum(tree_node *node);

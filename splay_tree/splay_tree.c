@@ -25,6 +25,31 @@ void splay_tree_insert(splay_tree *tree, void *value) {
     splay(tree, new_node);
 }
 
+void splay_tree_delete(splay_tree *tree, void *value) {
+    splay_node *x, *y;
+
+    if((x = bst_search_node((bst*)tree, value)) == NULL)
+        return;
+
+    splay(tree, x);
+
+    if(x->left == NULL) {
+        bst_replace_node((bst*)tree, x, x->right);
+    } else if(x->right == NULL) {
+        bst_replace_node((bst*)tree, x, x->left);
+    } else {
+        y = bst_minimum(x->right);
+        if(y->parent != x) {
+            bst_replace_node((bst*)tree, y, y->right);
+        }
+        bst_replace_node((bst*)tree, x, y);
+        y->left = x->left;
+        y->left->parent = y;
+    }
+
+    free(x);
+}
+
 static void splay(splay_tree *tree, splay_node *x) {
     while(x->parent) {
         if(x->parent->parent == NULL) {

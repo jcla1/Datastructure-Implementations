@@ -77,6 +77,18 @@ void bst_insert_node(bst *tree, tree_node *node) {
         prev->right = node;
 }
 
+void bst_replace_node(bst *tree, tree_node *u, tree_node *v) {
+    if(u->parent == NULL)
+        tree->root = v;
+    else if(u == u->parent->left)
+        u->parent->left = v;
+    else
+        u->parent->right = v;
+
+    if(v != NULL)
+        v->parent = u->parent;
+}
+
 tree_node *bst_predecessor(tree_node *x) {
   tree_node *y;
 

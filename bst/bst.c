@@ -2,6 +2,32 @@
 
 #include "bst.h"
 
+bst *bst_create(tree_cmp_fn cmp) {
+    bst *tree;
+
+    if((tree = calloc(1, sizeof(bst))) == NULL)
+        return NULL;
+
+    tree->cmp = cmp;
+
+    return tree;
+}
+
+void bst_destroy(bst* tree) {
+    if(tree->root != NULL)
+        bst_subtree_destroy(tree->root);
+    free(tree);
+}
+
+static void bst_subtree_destroy(tree_node *node) {
+    if(node->left != NULL)
+        bst_subtree_destroy(node->left);
+    if(node->right != NULL)
+        bst_subtree_destroy(node->right);
+
+    free(node);
+}
+
 tree_node *bst_search_node(bst *tree, void *value) {
     tree_node *cur;
     int comp_res;

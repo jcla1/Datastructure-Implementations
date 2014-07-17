@@ -16,6 +16,10 @@ struct bst {
     tree_node *root;
 };
 
+bst *bst_create(tree_cmp_fn cmp);
+void bst_destroy(bst* tree);
+static void bst_subtree_destroy(tree_node *node);
+
 tree_node *bst_search_node(bst *tree, void *value);
 void bst_insert_node(bst *tree, tree_node *node);
 

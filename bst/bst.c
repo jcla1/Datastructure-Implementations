@@ -63,15 +63,15 @@ void bst_insert_node(bst *tree, tree_node *node) {
         prev = cur;
         comp_res = tree->cmp(cur->value, node->value);
 
-    if(comp_res <= 0)
-        cur = cur->left;
-    else
-        cur = cur->right;
+        if(comp_res >= 0)
+            cur = cur->left;
+        else
+            cur = cur->right;
     }
 
     node->parent = prev;
 
-    if(comp_res == 0)
+    if(comp_res >= 0)
         prev->left = node;
     else
         prev->right = node;
@@ -120,7 +120,7 @@ tree_node *bst_maximum(tree_node *node) {
 }
 
 void bst_traverse(bst *tree, tree_traverse_fn fn) {
-    if(tree->root != NULL)
+    if(tree->root == NULL)
         return;
 
     bst_sub_traverse(tree->root, fn);

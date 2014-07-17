@@ -19,6 +19,8 @@ void splay_tree_insert(splay_tree *tree, void *value) {
         return;
     }
 
+    new_node->value = value;
+
     bst_insert_node((bst*)tree, (tree_node*)new_node);
     splay(tree, new_node);
 }

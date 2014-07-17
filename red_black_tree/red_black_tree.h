@@ -18,7 +18,6 @@ struct rb_tree {
 
 rb_tree *rb_tree_create(tree_cmp_fn cmp);
 void rb_tree_destroy(rb_tree *tree);
-void *rb_tree_search(rb_tree *tree, void *value);
 void rb_tree_insert(rb_tree *tree, void *value);
 // void *rb_tree_delete(rb_tree *tree, void *val);
 

@@ -5,14 +5,7 @@
 #include "red_black_tree.h"
 
 rb_tree *rb_tree_create(tree_cmp_fn cmp) {
-  rb_tree *tree;
-
-  if((tree = calloc(1, sizeof(rb_tree))) == NULL)
-    return NULL;
-
-  tree->cmp = cmp;
-
-  return tree;
+  return (rb_tree*)bst_create(cmp);
 }
 
 void rb_tree_destroy(rb_tree *tree) {
@@ -28,13 +21,6 @@ static void rb_destroy_nodes(rb_tree_node *node) {
     rb_destroy_nodes(node->right);
 
   free(node);
-}
-
-void *rb_tree_search(rb_tree *tree, void *value) {
-  rb_tree_node *node;
-  if((node = (rb_tree_node*)bst_search_node((bst*)tree, value)) == NULL)
-    return NULL;
-  return node->value;
 }
 
 void rb_tree_insert(rb_tree *tree, void *value) {

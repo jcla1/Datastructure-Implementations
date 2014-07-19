@@ -19,9 +19,10 @@ struct rb_tree {
 rb_tree *rb_tree_create(tree_cmp_fn cmp);
 void rb_tree_destroy(rb_tree *tree);
 void rb_tree_insert(rb_tree *tree, void *value);
-// void *rb_tree_delete(rb_tree *tree, void *val);
+void *rb_tree_delete(rb_tree *tree, void *value);
 
 static rb_tree_node *rb_tree_new_node(void *value);
 static void rb_destroy_nodes(rb_tree_node *node);
+static void rb_delete_fixup(rb_tree *tree, rb_tree_node *node, rb_tree_node *node_parent, int node_is_left);
 
 #endif // DATASTRUCTURES_RED_BLACK_TREE_H_

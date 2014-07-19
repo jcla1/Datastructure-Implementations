@@ -8,7 +8,7 @@ int int_cmp(void *a, void *b) {
     return (ia > ib) - (ia < ib);
 }
 
-void my_print(void *a) {
+void my_print(void *a, void *param) {
     printf("%d\n", *(int*)a);
 }
 
@@ -22,7 +22,7 @@ int main(void) {
         splay_tree_insert(tree, &nums[i]);
     }
 
-    // bst_traverse(tree, my_print);
+    // bst_traverse(tree, my_print, NULL);
     // printf("-------\n");
 
     splay_node *cur = tree->root;

@@ -131,21 +131,37 @@ tree_node *bst_maximum(tree_node *node) {
 	return node;
 }
 
-void bst_traverse(bst *tree, tree_traverse_fn fn) {
+int bst_max_depth(tree_node *node) {
+	int dl, dr;
+
+	if(node == NULL)
+		return 0;
+
+	dl = bst_max_depth(node->left);
+	dr = bst_max_depth(node->right);
+
+	return (dl > dr ? dl : dr) + 1;
+}
+
+void bst_traverse(bst *tree, tree_traverse_fn fn, void *param) {
 	if(tree->root == NULL)
 		return;
 
-	bst_sub_traverse(tree->root, fn);
+	bst_sub_traverse(tree->root, fn, param);
 }
 
-static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn) {
-	if(node->left != NULL)
-		bst_sub_traverse(node->left, fn);
+void bst_print(bst *tree) {
 
-	fn(node->value);
+}
+
+static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn, void *param) {
+	if(node->left != NULL)
+		bst_sub_traverse(node->left, fn, param);
+
+	fn(node->value, param);
 
 	if(node->right != NULL)
-		bst_sub_traverse(node->right, fn);
+		bst_sub_traverse(node->right, fn, param);
 }
 
 void bst_left_rotate(bst *tree, tree_node *x) {

@@ -79,6 +79,49 @@ void rb_tree_insert(rb_tree *tree, void *value) {
   tree->root->color = BLACK;
 }
 
+// Delete operation adapted from: http://stackoverflow.com/a/12081824/678164
+void *rb_tree_delete(rb_tree *tree, void *value) {
+  rb_tree_node *node, *x, *x_parent, *y;
+  int y_is_left;
+
+  y_is_left = 0;
+
+  if((node = (rb_tree_node*)bst_search_node((bst*)tree, value)) == NULL)
+    return NULL;
+
+  if(node->left == NULL || node->right == NULL)
+    y = node;
+  else
+    bst_successor((tree_node*)node);
+
+  if(y->left != NULL)
+    x = y->left;
+  else
+    x = y->right;
+
+  if(x != NULL)
+    x->parent = y->parent;
+
+  x_parent = y->parent;
+
+  if(y->parent == NULL) {
+    tree->root = x;
+  } else if(y == y->parent->left) {
+    y->parent->left = x;
+    y_is_left = 1;
+  } else {
+    y->parent->right = x;
+  }
+
+  if(y != node)
+    node->value = y->value;
+
+  if(y->color == BLACK)
+    rb_delete_fixup(tree, x, x_parent, y_is_left);
+
+  return y->value;
+}
+
 static rb_tree_node *rb_tree_new_node(void *value) {
   rb_tree_node *node;
 

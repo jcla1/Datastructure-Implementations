@@ -103,7 +103,7 @@ tree_node *bst_predecessor(tree_node *x) {
 	return y;
 }
 
-tree_node *bst_successor(tree_node *x) {
+tree_node *bst_sucessor(tree_node *x) {
 	tree_node *y;
 
 	if(x->right != NULL)

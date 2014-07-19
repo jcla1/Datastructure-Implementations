@@ -92,7 +92,7 @@ void *rb_tree_delete(rb_tree *tree, void *value) {
   if(node->left == NULL || node->right == NULL)
     y = node;
   else
-    bst_successor((tree_node*)node);
+    bst_sucessor((tree_node*)node);
 
   if(y->left != NULL)
     x = y->left;
@@ -120,6 +120,78 @@ void *rb_tree_delete(rb_tree *tree, void *value) {
     rb_delete_fixup(tree, x, x_parent, y_is_left);
 
   return y->value;
+}
+
+static void rb_delete_fixup(rb_tree *tree, rb_tree_node *node, rb_tree_node *node_parent, int node_is_left) {
+  rb_tree_node *w;
+
+  while(node != tree->root && node->color == BLACK) {
+    if(node_is_left) {
+      w = node_parent->right;
+      if(w->color == RED) {
+        w->color = BLACK;
+        node_parent->color = RED;
+        bst_left_rotate((bst*)tree, (tree_node*)node_parent);
+        w = node_parent->right;
+      }
+
+      if(w->left->color == BLACK && w->right->color == BLACK) {
+        w->color = RED;
+        node = node_parent;
+        node_parent = node->parent;
+        node_is_left = (node_parent != NULL && node == node_parent->left);
+      } else {
+        if(w->right->color == BLACK) {
+          w->left->color = BLACK;
+          w->color = RED;
+          bst_right_rotate((bst*)tree, (tree_node*)w);
+          w = node_parent->right;
+        }
+
+        w->color = node_parent->color;
+        node_parent->color = BLACK;
+        if(w->right != NULL) {
+          w->right->color = BLACK;
+        }
+        bst_left_rotate((bst*)tree, (tree_node*)node_parent);
+        node = tree->root;
+        node_parent = NULL;
+      }
+    } else {
+      w = node_parent->left;
+      if(w->color == RED) {
+        w->color = BLACK;
+        node_parent->color = RED;
+        bst_right_rotate((bst*)tree, (tree_node*)node_parent);
+        w = node_parent->left;
+      }
+
+      if(w->right->color == BLACK && w->left->color == BLACK) {
+        w->color = RED;
+        node = node_parent;
+        node_parent = node->parent;
+        node_is_left = (node_parent != NULL && node == node_parent->left);
+      } else {
+        if(w->left->color == BLACK) {
+          w->right->color = BLACK;
+          w->color = RED;
+          bst_left_rotate((bst*)tree, (tree_node*)w);
+          w = node_parent->left;
+        }
+
+        w->color = node_parent->color;
+        node_parent->color = BLACK;
+        if(w->left != NULL) {
+          w->left->color = BLACK;
+        }
+        bst_right_rotate((bst*)tree, (tree_node*)node_parent);
+        node = tree->root;
+        node_parent = NULL;
+      }
+    }
+  }
+
+  node->color = BLACK;
 }
 
 static rb_tree_node *rb_tree_new_node(void *value) {

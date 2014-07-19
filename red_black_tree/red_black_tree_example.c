@@ -25,21 +25,18 @@ int main() {
       rb_tree_insert(tree, &nums[i]);
     }
 
-    // for (int i = 0; i < 10; i++) {
-    //   printf("Removing: %d.\n", nums[i]);
-    //   rb_tree_delete(tree, &nums[i]);
+    for (int i = 0; i < 10; i++) {
+      printf("Removing: %d.\n", nums[i]);
+      rb_tree_delete(tree, &nums[i]);
 
-    //   bst_traverse_inorder(tree, my_trav);
-    //   printf("\n");
+      rb_tree_node *cur = tree->root;
+      while(cur != NULL) {
+        printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
+        cur = cur->left;
+      }
 
-    //   rb_tree_node *cur = tree->root;
-    //   while(cur != NULL) {
-    //     printf("%s :: %d\n", (int)cur->color ? "BLACK" : "RED", *(int*)cur->value);
-    //     cur = cur->left;
-    //   }
-
-    //   printf("\n\n");
-    // }
+      printf("\n\n");
+    }
 
     return 0;
 }

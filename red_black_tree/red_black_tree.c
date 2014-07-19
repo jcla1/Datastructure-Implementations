@@ -125,7 +125,7 @@ void *rb_tree_delete(rb_tree *tree, void *value) {
 static void rb_delete_fixup(rb_tree *tree, rb_tree_node *node, rb_tree_node *node_parent, int node_is_left) {
   rb_tree_node *w;
 
-  while(node != tree->root && node->color == BLACK) {
+  while(node != tree->root && node != NULL && node->color == BLACK) {
     if(node_is_left) {
       w = node_parent->right;
       if(w->color == RED) {
@@ -190,8 +190,8 @@ static void rb_delete_fixup(rb_tree *tree, rb_tree_node *node, rb_tree_node *nod
       }
     }
   }
-
-  node->color = BLACK;
+  if(node != NULL)
+    node->color = BLACK;
 }
 
 static rb_tree_node *rb_tree_new_node(void *value) {

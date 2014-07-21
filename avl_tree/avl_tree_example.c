@@ -19,6 +19,7 @@ int main(void) {
     int nums[] = {40, 50, 30, 20, 45};
 
     for(int i = 0; i < 5; i++) {
+        printf("inserting: %d\n", nums[i]);
         avl_insert(tree, &nums[i]);
     }
 

@@ -28,7 +28,7 @@ tree_node *bst_maximum(tree_node *node);
 tree_node *bst_predecessor(tree_node *x);
 tree_node *bst_sucessor(tree_node *x);
 
-int bst_max_depth(bst *tree);
+int bst_max_depth(tree_node *node);
 
 void bst_traverse(bst *tree, tree_traverse_fn fn, void *param);
 // void bst_print(bst *tree);

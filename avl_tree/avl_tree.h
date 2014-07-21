@@ -23,4 +23,6 @@ void avl_destroy(avl_tree *tree);
 void avl_insert(avl_tree *tree, void *value);
 void *avl_delete(avl_tree *tree, void *value);
 
+static void avl_destroy_nodes(avl_node *node);
+
 #endif // DATASTRUCTURES_AVL_TREE_H_

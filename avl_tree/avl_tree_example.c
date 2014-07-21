@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "avl_tree.h"
 
 int int_cmp(void *a, void *b) {
@@ -18,10 +19,10 @@ int main(void) {
     int nums[] = {40, 50, 30, 20, 45};
 
     for(int i = 0; i < 5; i++) {
-        avl_tree_insert(tree, &nums[i]);
+        avl_insert(tree, &nums[i]);
     }
 
-    bst_traverse(tree, my_print, NULL);
+    bst_traverse((bst*)tree, my_print, NULL);
     printf("--------\n");
 
     avl_node *cur = tree->root;

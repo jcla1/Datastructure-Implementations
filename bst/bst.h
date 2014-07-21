@@ -31,7 +31,7 @@ tree_node *bst_sucessor(tree_node *x);
 int bst_max_depth(bst *tree);
 
 void bst_traverse(bst *tree, tree_traverse_fn fn, void *param);
-void bst_print(bst *tree);
+// void bst_print(bst *tree);
 
 static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn, void *param);
 static void bst_subtree_destroy(tree_node *node);

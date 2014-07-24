@@ -159,21 +159,26 @@ static void bst_print_helper(tree_node *node, tree_print_fn fn, int indent) {
 	fn(node);
 	printf("\n");
 
-	for (int i = 0; i <= indent; ++i)
-		printf(BST_BLANK);
-	printf(BST_LINE_T);
-	if(node->left != NULL)
-		bst_print_helper(node->left, fn, indent+1);
-	else
-		printf("\n");
+	if(node->left == NULL && node->right == NULL)
+		return;
 
 	for (int i = 0; i <= indent; ++i)
-		printf(BST_BLANK);
-	printf(BST_LINE_L);
-	if(node->right != NULL)
+			printf(BST_BLANK);
+	if(node->left != NULL) {
+		printf(BST_LINE_T);
+		bst_print_helper(node->left, fn, indent+1);
+	} else {
+		puts(BST_LINE_I);
+	}
+
+	for (int i = 0; i <= indent; ++i)
+			printf(BST_BLANK);
+	if(node->right != NULL) {
+		printf(BST_LINE_T);
 		bst_print_helper(node->right, fn, indent+1);
-	else
-		printf("\n");
+	} else {
+		puts(BST_LINE_I);
+	}
 }
 
 static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn, void *param) {

@@ -4,7 +4,7 @@
 #define BST_LINE_T "|--- "
 #define BST_LINE_L "'--- "
 #define BST_LINE_I "|    "
-#define BST_BLANK  "     "
+#define BST_BLANK  "   "
 
 typedef int (*tree_cmp_fn)(void *, void *);
 typedef void (*tree_traverse_fn)(void *, void *);

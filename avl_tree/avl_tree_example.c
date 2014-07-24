@@ -16,9 +16,9 @@ int main(void) {
     avl_tree *tree;
     tree = avl_create(int_cmp);
 
-    int nums[] = {40, 50, 30, 20, 45};
+    int nums[] = {40, 50, 30, 20, 45, 10};
 
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 6; i++) {
         printf("inserting: %d\n", nums[i]);
         avl_insert(tree, &nums[i]);
     }
@@ -28,7 +28,7 @@ int main(void) {
 
     avl_node *cur = tree->root;
     while(cur != NULL) {
-        printf("%d\n", *(int*)cur->value);
+        printf("%d :: %d\n", cur->balance, *(int*)cur->value);
         cur = cur->left;
     }
 

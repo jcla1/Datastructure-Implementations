@@ -51,14 +51,4 @@ void avl_insert(avl_tree *tree, void *value) {
             bst_right_rotate((bst*)tree, (tree_node*)cur->right);
         bst_left_rotate((bst*)tree, (tree_node*)cur);
     }
-
-    while(node != NULL) {
-        if(prev == cur->left)
-            cur->balance += 1;
-        else
-            cur->balance -= 1;
-
-        prev = cur;
-        cur = cur->parent;
-    }
 }

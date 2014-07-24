@@ -66,12 +66,12 @@ static void avl_left_rotate(avl_tree *tree, avl_node *x) {
 
     bst_left_rotate((bst*)tree, (tree_node*)x);
     y = x->parent;
+
     x_left_balance = x->left ? x->left->balance : 0;
     x_right_balance = x->right ? x->right->balance : 0;
     x->balance = x_left_balance - x_right_balance;
 
     y_right_balance = y->right ? y->right->balance : 0;
-
     y->balance = x->balance - y_right_balance;
 }
 
@@ -89,4 +89,8 @@ static void avl_right_rotate(avl_tree *tree, avl_node *y) {
     x_right_balance = x->right ? x->right->balance : 0;
 
     x->balance = y->balance - x_right_balance;
+}
+
+static inline int max(int a, int b) {
+    return (a > b) ? a : b;
 }

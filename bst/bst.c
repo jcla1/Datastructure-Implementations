@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "bst.h"
 
@@ -150,8 +151,29 @@ void bst_traverse(bst *tree, tree_traverse_fn fn, void *param) {
 	bst_sub_traverse(tree->root, fn, param);
 }
 
-void bst_print(bst *tree) {
+void bst_print(bst *tree, tree_print_fn fn) {
+	bst_print_helper(tree->root, fn, 0);
+}
 
+static void bst_print_helper(tree_node *node, tree_print_fn fn, int indent) {
+	fn(node);
+	printf("\n");
+
+	for (int i = 0; i <= indent; ++i)
+		printf(BST_BLANK);
+	printf(BST_LINE_T);
+	if(node->left != NULL)
+		bst_print_helper(node->left, fn, indent+1);
+	else
+		printf("\n");
+
+	for (int i = 0; i <= indent; ++i)
+		printf(BST_BLANK);
+	printf(BST_LINE_L);
+	if(node->right != NULL)
+		bst_print_helper(node->right, fn, indent+1);
+	else
+		printf("\n");
 }
 
 static void bst_sub_traverse(tree_node *node, tree_traverse_fn fn, void *param) {

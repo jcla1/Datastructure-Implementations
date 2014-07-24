@@ -37,18 +37,56 @@ void avl_insert(avl_tree *tree, void *value) {
     cur = node->parent;
     prev = node;
 
-    if(prev == cur->left)
-        cur->balance += 1;
-    else
-        cur->balance -= 1;
+    while(cur != NULL) {
+        if(prev == cur->left)
+            cur->balance += 1;
+        else
+            cur->balance -= 1;
 
-    if(cur->balance == 2) {
-        if(cur->left->balance == -1)
-            bst_left_rotate((bst*)tree, (tree_node*)cur->left);
-        bst_right_rotate((bst*)tree, (tree_node*)cur);
-    } else if(cur->balance == -2) {
-        if(cur->right->balance == 1)
-            bst_right_rotate((bst*)tree, (tree_node*)cur->right);
-        bst_left_rotate((bst*)tree, (tree_node*)cur);
+        if(cur->balance == 2) {
+            if(cur->left->balance == -1)
+                avl_left_rotate(tree, cur->left);
+            avl_right_rotate(tree, cur);
+            break;
+        } else if(cur->balance == -2) {
+            if(cur->right->balance == 1)
+                avl_right_rotate(tree, cur->right);
+            avl_left_rotate(tree, cur);
+            break;
+        }
+
+        prev = cur;
+        cur = cur->parent;
     }
+}
+
+static void avl_left_rotate(avl_tree *tree, avl_node *x) {
+    avl_node *y;
+    int x_left_balance, x_right_balance, y_right_balance;
+
+    bst_left_rotate((bst*)tree, (tree_node*)x);
+    y = x->parent;
+    x_left_balance = x->left ? x->left->balance : 0;
+    x_right_balance = x->right ? x->right->balance : 0;
+    x->balance = x_left_balance - x_right_balance;
+
+    y_right_balance = y->right ? y->right->balance : 0;
+
+    y->balance = x->balance - y_right_balance;
+}
+
+static void avl_right_rotate(avl_tree *tree, avl_node *y) {
+    avl_node *x;
+    int y_left_balance, y_right_balance, x_right_balance;
+
+    bst_right_rotate((bst*)tree, (tree_node*)y);
+    x = y->parent;
+
+    y_left_balance = x->left ? y->left->balance : 0;
+    y_right_balance = x->right ? y->right->balance : 0;
+    y->balance = y_left_balance - y_right_balance;
+
+    x_right_balance = x->right ? x->right->balance : 0;
+
+    x->balance = y->balance - x_right_balance;
 }

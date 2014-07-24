@@ -14,23 +14,40 @@ void my_print(void *a, void *param) {
 
 int main(void) {
     avl_tree *tree;
+    avl_node *cur;
     tree = avl_create(int_cmp);
 
-    int nums[] = {40, 50, 30, 20, 45, 10};
+    int nums[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 
-    for(int i = 0; i < 6; i++) {
+    for(int i = 0; i < 10; i++) {
         printf("inserting: %d\n", nums[i]);
         avl_insert(tree, &nums[i]);
+
+        printf("left:");
+        cur = tree->root;
+        while(cur != NULL) {
+            printf("\t%d :: %d\n", cur->balance, *(int*)cur->value);
+            cur = cur->left;
+        }
+
+        printf("right:");
+        cur = tree->root;
+        while(cur != NULL) {
+            printf("\t%d :: %d\n", cur->balance, *(int*)cur->value);
+            cur = cur->right;
+        }
+
+        printf("--------\n");
     }
 
-    bst_traverse((bst*)tree, my_print, NULL);
-    printf("--------\n");
+    // bst_traverse((bst*)tree, my_print, NULL);
+    // printf("--------\n");
 
-    avl_node *cur = tree->root;
-    while(cur != NULL) {
-        printf("%d :: %d\n", cur->balance, *(int*)cur->value);
-        cur = cur->left;
-    }
+    // avl_node *cur = tree->root;
+    // while(cur != NULL) {
+    //     printf("%d :: %d\n", cur->balance, *(int*)cur->value);
+    //     cur = cur->left;
+    // }
 
     return 0;
 }

@@ -82,8 +82,8 @@ static void avl_right_rotate(avl_tree *tree, avl_node *y) {
     bst_right_rotate((bst*)tree, (tree_node*)y);
     x = y->parent;
 
-    y_left_balance = x->left ? y->left->balance : 0;
-    y_right_balance = x->right ? y->right->balance : 0;
+    y_left_balance = y->left ? y->left->balance : 0;
+    y_right_balance = y->right ? y->right->balance : 0;
     y->balance = y_left_balance - y_right_balance;
 
     x_right_balance = x->right ? x->right->balance : 0;

@@ -10,7 +10,7 @@ int int_cmp(void *a, void *b) {
 
 void tree_print(tree_node *tn) {
     avl_node *node = (avl_node*)tn;
-    printf("%d", *(int*)node->value);
+    printf("%d :: %d", node->balance, *(int*)node->value);
 }
 
 int main(void) {
@@ -18,9 +18,9 @@ int main(void) {
     avl_node *cur;
     tree = avl_create(int_cmp);
 
-    int nums[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    int nums[] = {58, 98, 43, 74, 74, 65, 93, 81, 76, 6, 78, 73, 62, 84, 48, 21, 15, 41, 36, 98};
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 5; i++) {
         // printf("inserting: %d\n", nums[i]);
         avl_insert(tree, &nums[i]);
 

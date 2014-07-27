@@ -3,8 +3,11 @@
 #include "bst/bst.h"
 #include "red_black_tree.h"
 
-int compare_ints (void *a, void *b) {
-   return *(int*)a < *(int*)b;
+int int_cmp(void *a, void *b) {
+    int ia = *(int*)a;
+    int ib = *(int*)b;
+
+    return (ia > ib) - (ia < ib);
 }
 
 void my_trav(void *i1) {
@@ -14,7 +17,7 @@ void my_trav(void *i1) {
 int main() {
     rb_tree *tree;
 
-    if((tree = rb_tree_create(compare_ints)) == NULL) {
+    if((tree = rb_tree_create(int_cmp)) == NULL) {
       fprintf(stderr, "[main]: tree creation failed\n");
       return -1;
     }

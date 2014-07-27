@@ -36,13 +36,16 @@ tree_node *bst_search_node(bst *tree, void *value) {
 	cur = tree->root;
 	while(cur != NULL) {
 		comp_res = tree->cmp(cur->value, value);
-
-	if(comp_res == 0)
-		return cur;
-	else if(comp_res < 0)
-		cur = cur->left;
-	else
-		cur = cur->right;
+		// int a = *(int*)cur->value;
+		// int b = *(int*)value;
+		// comp_res = (a < b) - (a > b);
+		printf("tree->cmp(%d, %d) == %d\n", *(int*)cur->value, *(int*)value, comp_res);
+		if(comp_res == 0)
+			return cur;
+		else if(comp_res > 0)
+			cur = cur->left;
+		else
+			cur = cur->right;
 	}
 
 	return NULL; // value not present
@@ -79,6 +82,9 @@ void bst_insert_node(bst *tree, tree_node *node) {
 }
 
 void bst_replace_node(bst *tree, tree_node *u, tree_node *v) {
+	if(u == NULL)
+		return;
+
 	if(u->parent == NULL)
 		tree->root = v;
 	else if(u == u->parent->left)

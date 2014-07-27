@@ -23,6 +23,26 @@ static void avl_destroy_nodes(avl_node *node) {
     free(node);
 }
 
+int avl_get_height(avl_node *node) {
+    if(node == NULL)
+        return 0;
+    return node->height;
+}
+
+int avl_get_balance(avl_node *node) {
+    if(node == NULL)
+        return 0;
+
+    if(node->left == NULL && node->right == NULL)
+        return 0;
+    else if(node->left == NULL)
+        return -node->right->height;
+    else if(node->right == NULL)
+        return node->left->height;
+    else
+        return node->left->height - node->right->height;
+}
+
 void avl_insert(avl_tree *tree, void *value) {
     avl_node *node, *cur, *prev;
 
@@ -30,6 +50,7 @@ void avl_insert(avl_tree *tree, void *value) {
         fprintf(stderr, "[avl_insert]: error allocating memory\n");
         return;
     }
+    node->height = 1;
     node->value = value;
 
     bst_insert_node((bst*)tree, (tree_node*)node);
@@ -38,21 +59,17 @@ void avl_insert(avl_tree *tree, void *value) {
     prev = node;
 
     while(cur != NULL) {
-        if(prev == cur->left)
-            cur->balance += 1;
-        else
-            cur->balance -= 1;
+        if(cur->height < (prev->height+1))
+            cur->height = prev->height + 1;
 
-        if(cur->balance == 2) {
-            if(cur->left->balance == -1)
+        if(avl_get_balance(cur) >= 2) {
+            if(avl_get_balance(node->left) <= -1)
                 avl_left_rotate(tree, cur->left);
             avl_right_rotate(tree, cur);
-            break;
-        } else if(cur->balance == -2) {
-            if(cur->right->balance == 1)
+        } else if(avl_get_balance(cur) <= -2) {
+            if(avl_get_balance(cur->right) >= 1)
                 avl_right_rotate(tree, cur->right);
             avl_left_rotate(tree, cur);
-            break;
         }
 
         prev = cur;
@@ -60,37 +77,28 @@ void avl_insert(avl_tree *tree, void *value) {
     }
 }
 
+static inline int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
 static void avl_left_rotate(avl_tree *tree, avl_node *x) {
-    avl_node *y;
-    int x_left_balance, x_right_balance, y_right_balance;
+    avl_node *y, *parent;
+    int xlb, xrb, yrb, plb, prb;
 
     bst_left_rotate((bst*)tree, (tree_node*)x);
     y = x->parent;
 
-    x_left_balance = x->left ? x->left->balance : 0;
-    x_right_balance = x->right ? x->right->balance : 0;
-    x->balance = x_left_balance - x_right_balance;
-
-    y_right_balance = y->right ? y->right->balance : 0;
-    y->balance = x->balance - y_right_balance;
+    x->height = max(avl_get_height(x->left), avl_get_height(x->right)) + 1;
+    y->height = max(avl_get_height(x), avl_get_height(y->right)) + 1;
 }
 
 static void avl_right_rotate(avl_tree *tree, avl_node *y) {
-    avl_node *x;
-    int y_left_balance, y_right_balance, x_right_balance;
+    avl_node *x, *parent;
+    int xlb, ylb, yrb, plb, prb;
 
     bst_right_rotate((bst*)tree, (tree_node*)y);
     x = y->parent;
 
-    y_left_balance = y->left ? y->left->balance : 0;
-    y_right_balance = y->right ? y->right->balance : 0;
-    y->balance = y_left_balance - y_right_balance;
-
-    x_right_balance = x->right ? x->right->balance : 0;
-
-    x->balance = y->balance - x_right_balance;
-}
-
-static inline int max(int a, int b) {
-    return (a > b) ? a : b;
+    y->height = max(avl_get_height(y->left), avl_get_height(y->right)) + 1;
+    x->height = max(avl_get_height(x->left), avl_get_height(y)) + 1;
 }

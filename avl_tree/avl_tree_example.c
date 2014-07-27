@@ -10,7 +10,11 @@ int int_cmp(void *a, void *b) {
 
 void tree_print(tree_node *tn) {
     avl_node *node = (avl_node*)tn;
-    printf("%d :: %d", node->balance, *(int*)node->value);
+    printf("%d :: %d -> %d", avl_get_height(node), avl_get_balance(node), *(int*)node->value);
+}
+
+void my_print(void *val, void *_) {
+    printf("%d ", *(int*)val);
 }
 
 int main(void) {
@@ -19,36 +23,20 @@ int main(void) {
     tree = avl_create(int_cmp);
 
     int nums[] = {58, 98, 43, 74, 74, 65, 93, 81, 76, 6, 78, 73, 62, 84, 48, 21, 15, 41, 36, 98};
+    // int nums[] = {1,2,3,4,5,6,7};
 
-    for(int i = 0; i < 5; i++) {
-        // printf("inserting: %d\n", nums[i]);
+    for(int i = 0; i < 20; i++) {
+        bst_print((bst*)tree, tree_print);
+
+        printf("\ninserting: %d\n\n", nums[i]);
         avl_insert(tree, &nums[i]);
 
-        // printf("left:");
-        // cur = tree->root;
-        // while(cur != NULL) {
-        //     printf("\t%d :: %d\n", cur->balance, *(int*)cur->value);
-        //     cur = cur->left;
-        // }
-
-        // printf("right:");
-        // cur = tree->root;
-        // while(cur != NULL) {
-        //     printf("\t%d :: %d\n", cur->balance, *(int*)cur->value);
-        //     cur = cur->right;
-        // }
-
-        // printf("--------\n");
+        bst_print((bst*)tree, tree_print);
+        printf("\n===========================\n\n");
     }
 
     // bst_traverse((bst*)tree, my_print, NULL);
-    // printf("--------\n");
+    // puts("");
 
-    // avl_node *cur = tree->root;
-    // while(cur != NULL) {
-    //     printf("%d :: %d\n", cur->balance, *(int*)cur->value);
-    //     cur = cur->left;
-    // }
-    bst_print((bst*)tree, tree_print);
     return 0;
 }

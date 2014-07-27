@@ -7,7 +7,8 @@ typedef struct avl_node avl_node;
 struct avl_node {
     avl_node *left, *right, *parent;
     void *value;
-    short balance;
+    /* describes max(left_height, right_height) */
+    short height;
 };
 
 
@@ -22,6 +23,9 @@ void avl_destroy(avl_tree *tree);
 
 void avl_insert(avl_tree *tree, void *value);
 void *avl_delete(avl_tree *tree, void *value);
+
+int avl_get_height(avl_node *node);
+int avl_get_balance(avl_node *node);
 
 static void avl_destroy_nodes(avl_node *node);
 static void avl_left_rotate(avl_tree *tree, avl_node *x);

@@ -152,7 +152,8 @@ void bst_traverse(bst *tree, tree_traverse_fn fn, void *param) {
 }
 
 void bst_print(bst *tree, tree_print_fn fn) {
-	bst_print_helper(tree->root, fn, 0);
+	if(tree->root != NULL)
+		bst_print_helper(tree->root, fn, 0);
 }
 
 static void bst_print_helper(tree_node *node, tree_print_fn fn, int indent) {
@@ -174,7 +175,7 @@ static void bst_print_helper(tree_node *node, tree_print_fn fn, int indent) {
 	for (int i = 0; i <= indent; ++i)
 			printf(BST_BLANK);
 	if(node->right != NULL) {
-		printf(BST_LINE_T);
+		printf(BST_LINE_L);
 		bst_print_helper(node->right, fn, indent+1);
 	} else {
 		puts(BST_LINE_I);
@@ -218,17 +219,17 @@ void bst_right_rotate(bst *tree, tree_node *y) {
 	x = y->left;
 
 	y->left = x->right;
-	if(y->left != NULL)
-		y->left->parent = y;
+	if(x->right != NULL)
+		x->right->parent = y;
 
 	x->parent = y->parent;
 
-	if(y == tree->root)
+	if(y->parent == NULL)
 		tree->root = x;
-	else if(y == y->parent->left)
-		y->parent->left = x;
-	else
+	else if(y == y->parent->right)
 		y->parent->right = x;
+	else
+		y->parent->left = x;
 
 	x->right = y;
 	y->parent = x;

@@ -43,24 +43,14 @@ int avl_get_balance(avl_node *node) {
         return node->left->height - node->right->height;
 }
 
-void avl_insert(avl_tree *tree, void *value) {
-    avl_node *node, *cur, *prev;
-
-    if((node = calloc(1, sizeof(avl_node))) == NULL) {
-        fprintf(stderr, "[avl_insert]: error allocating memory\n");
-        return;
-    }
-    node->height = 1;
-    node->value = value;
-
-    bst_insert_node((bst*)tree, (tree_node*)node);
+static void avl_unwind(avl_tree *tree, avl_node *node) {
+    avl_node *cur, *prev;
 
     cur = node->parent;
     prev = node;
 
     while(cur != NULL) {
-        if(cur->height < (prev->height+1))
-            cur->height = prev->height + 1;
+        cur->height = max(avl_get_height(cur->left), avl_get_height(cur->right)) + 1;
 
         if(avl_get_balance(cur) >= 2) {
             if(avl_get_balance(node->left) <= -1)
@@ -75,6 +65,38 @@ void avl_insert(avl_tree *tree, void *value) {
         prev = cur;
         cur = cur->parent;
     }
+}
+
+void avl_insert(avl_tree *tree, void *value) {
+    avl_node *node, *cur, *prev;
+
+    if((node = calloc(1, sizeof(avl_node))) == NULL) {
+        fprintf(stderr, "[avl_insert]: error allocating memory\n");
+        return;
+    }
+    node->height = 1;
+    node->value = value;
+
+    bst_insert_node((bst*)tree, (tree_node*)node);
+
+    avl_unwind(tree, node);
+}
+
+void *avl_delete(avl_tree *tree, void *value) {
+    avl_node *node;
+    void *val;
+
+    if((node = (avl_node*)bst_search_node((bst*)tree, value)) == NULL)
+        return NULL;
+
+    if(node->left == NULL && node->right != NULL) {
+        val = node->value;
+        node->value = node->right->value;
+        node->height -= 1;
+        avl_unwind(tree, node);
+    }
+
+    return val;
 }
 
 static inline int max(int a, int b) {

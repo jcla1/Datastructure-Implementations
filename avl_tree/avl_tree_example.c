@@ -2,8 +2,8 @@
 #include "avl_tree.h"
 
 int int_cmp(void *a, void *b) {
-    double ia = *(int*)a;
-    double ib = *(int*)b;
+    int ia = *(int*)a;
+    int ib = *(int*)b;
 
     return (ia > ib) - (ia < ib);
 }
@@ -26,17 +26,24 @@ int main(void) {
     // int nums[] = {1,2,3,4,5,6,7};
 
     for(int i = 0; i < 20; i++) {
+        // bst_print((bst*)tree, tree_print);
+
+        // printf("\ninserting: %d\n\n", nums[i]);
+        avl_insert(tree, &nums[i]);
+
+        // bst_print((bst*)tree, tree_print);
+        // printf("\n===========================\n\n");
+    }
+
+    for(int i = 0; i < 1; i++) {
         bst_print((bst*)tree, tree_print);
 
-        printf("\ninserting: %d\n\n", nums[i]);
-        avl_insert(tree, &nums[i]);
+        printf("\nremoving: %d\n\n", nums[i]);
+        avl_delete(tree, &nums[i]);
 
         bst_print((bst*)tree, tree_print);
         printf("\n===========================\n\n");
     }
-
-    // bst_traverse((bst*)tree, my_print, NULL);
-    // puts("");
 
     return 0;
 }

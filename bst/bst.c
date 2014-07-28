@@ -36,10 +36,7 @@ tree_node *bst_search_node(bst *tree, void *value) {
 	cur = tree->root;
 	while(cur != NULL) {
 		comp_res = tree->cmp(cur->value, value);
-		// int a = *(int*)cur->value;
-		// int b = *(int*)value;
-		// comp_res = (a < b) - (a > b);
-		printf("tree->cmp(%d, %d) == %d\n", *(int*)cur->value, *(int*)value, comp_res);
+
 		if(comp_res == 0)
 			return cur;
 		else if(comp_res > 0)

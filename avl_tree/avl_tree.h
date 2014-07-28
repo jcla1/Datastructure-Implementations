@@ -27,8 +27,10 @@ void *avl_delete(avl_tree *tree, void *value);
 int avl_get_height(avl_node *node);
 int avl_get_balance(avl_node *node);
 
+static void avl_unwind(avl_tree *tree, avl_node *node);
 static void avl_destroy_nodes(avl_node *node);
 static void avl_left_rotate(avl_tree *tree, avl_node *x);
 static void avl_right_rotate(avl_tree *tree, avl_node *y);
+static inline int max(int a, int b);
 
 #endif // DATASTRUCTURES_AVL_TREE_H_

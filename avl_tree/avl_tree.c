@@ -47,7 +47,6 @@ static void avl_unwind(avl_tree *tree, avl_node *node) {
     avl_node *cur, *prev;
 
     cur = node->parent;
-    prev = node;
 
     while(cur != NULL) {
         cur->height = max(avl_get_height(cur->left), avl_get_height(cur->right)) + 1;
@@ -83,20 +82,82 @@ void avl_insert(avl_tree *tree, void *value) {
 }
 
 void *avl_delete(avl_tree *tree, void *value) {
-    avl_node *node;
+    avl_node *node, *succ;
     void *val;
 
     if((node = (avl_node*)bst_search_node((bst*)tree, value)) == NULL)
         return NULL;
 
-    if(node->left == NULL && node->right != NULL) {
-        val = node->value;
-        node->value = node->right->value;
-        node->height -= 1;
-        avl_unwind(tree, node);
-    }
+    if(node->left == NULL && node->right == NULL) {
+        if(node == tree->root) {
+            tree->root = NULL;
+        } else {
+            if(node->parent->left == node)
+                node->parent->left = NULL;
+            else
+                node->parent->right = NULL;
 
-    return val;
+            avl_unwind(tree, node);
+        }
+
+        val = node->value;
+        free(node);
+        return val;
+    } else if(node->left != NULL && node->right == NULL) {
+        if(node == tree->root) {
+            tree->root = node->left;
+            tree->root->parent = NULL;
+        } else {
+            if(node->parent->left == node)
+                node->parent->left = node->left;
+            else
+                node->parent->right = node->left;
+
+            node->left->parent = node->parent;
+
+            avl_unwind(tree, node);
+        }
+
+        val = node->value;
+        free(node);
+        return val;
+    } else if(node->left == NULL && node->right != NULL) {
+        if(node == tree->root) {
+            tree->root = node->right;
+            tree->root->parent = NULL;
+        } else {
+            if(node->parent->left == node)
+                node->parent->left = node->right;
+            else
+                node->parent->right = node->right;
+
+            node->right->parent = node->parent;
+
+            avl_unwind(tree, node);
+        }
+
+        val = node->value;
+        free(node);
+        return val;
+    } else {
+        succ = (avl_node*)bst_sucessor((tree_node*)node);
+
+        val = node->value;
+        node->value = succ->value;
+
+        if(succ == node->right)
+            succ->parent->right = succ->right;
+        else
+            succ->parent->left = succ->right;
+
+        if(succ->right != NULL)
+            succ->right->parent = succ->parent;
+
+        avl_unwind(tree, succ);
+
+        free(succ);
+        return val;
+    }
 }
 
 static inline int max(int a, int b) {

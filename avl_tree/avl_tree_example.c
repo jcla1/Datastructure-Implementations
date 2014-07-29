@@ -26,24 +26,20 @@ int main(void) {
     // int nums[] = {1,2,3,4,5,6,7};
 
     for(int i = 0; i < 20; i++) {
+        avl_insert(tree, &nums[i]);
+    }
+
+    for(int i = 0; i < 5; i++) {
         // bst_print((bst*)tree, tree_print);
 
-        // printf("\ninserting: %d\n\n", nums[i]);
-        avl_insert(tree, &nums[i]);
+        // printf("\nremoving: %d\n\n", nums[i]);
+        avl_delete(tree, &nums[i]);
 
         // bst_print((bst*)tree, tree_print);
         // printf("\n===========================\n\n");
     }
 
-    for(int i = 0; i < 1; i++) {
-        bst_print((bst*)tree, tree_print);
-
-        printf("\nremoving: %d\n\n", nums[i]);
-        avl_delete(tree, &nums[i]);
-
-        bst_print((bst*)tree, tree_print);
-        printf("\n===========================\n\n");
-    }
+    bst_print((bst*)tree, tree_print);
 
     return 0;
 }

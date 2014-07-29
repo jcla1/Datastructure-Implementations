@@ -88,6 +88,8 @@ void *avl_delete(avl_tree *tree, void *value) {
     if((node = (avl_node*)bst_search_node((bst*)tree, value)) == NULL)
         return NULL;
 
+    val = node->value;
+
     if(node->left == NULL && node->right == NULL) {
         if(node == tree->root) {
             tree->root = NULL;
@@ -99,10 +101,6 @@ void *avl_delete(avl_tree *tree, void *value) {
 
             avl_unwind(tree, node);
         }
-
-        val = node->value;
-        free(node);
-        return val;
     } else if(node->left != NULL && node->right == NULL) {
         if(node == tree->root) {
             tree->root = node->left;
@@ -117,10 +115,6 @@ void *avl_delete(avl_tree *tree, void *value) {
 
             avl_unwind(tree, node);
         }
-
-        val = node->value;
-        free(node);
-        return val;
     } else if(node->left == NULL && node->right != NULL) {
         if(node == tree->root) {
             tree->root = node->right;
@@ -135,14 +129,10 @@ void *avl_delete(avl_tree *tree, void *value) {
 
             avl_unwind(tree, node);
         }
-
-        val = node->value;
-        free(node);
-        return val;
     } else {
         succ = (avl_node*)bst_sucessor((tree_node*)node);
 
-        val = node->value;
+
         node->value = succ->value;
 
         if(succ == node->right)
@@ -155,9 +145,11 @@ void *avl_delete(avl_tree *tree, void *value) {
 
         avl_unwind(tree, succ);
 
-        free(succ);
-        return val;
+        node = succ;
     }
+
+    free(node);
+    return val;
 }
 
 static inline int max(int a, int b) {

@@ -83,6 +83,7 @@ void rb_tree_insert(rb_tree *tree, void *value) {
 void *rb_tree_delete(rb_tree *tree, void *value) {
   rb_tree_node *node, *x, *x_parent, *y;
   int y_is_left;
+  void *result;
 
   y_is_left = 0;
 
@@ -119,7 +120,11 @@ void *rb_tree_delete(rb_tree *tree, void *value) {
   if(y->color == BLACK)
     rb_delete_fixup(tree, x, x_parent, y_is_left);
 
-  return y->value;
+  result = y->value;
+
+  free(y);
+
+  return result;
 }
 
 static void rb_delete_fixup(rb_tree *tree, rb_tree_node *node, rb_tree_node *node_parent, int node_is_left) {
@@ -202,6 +207,9 @@ static rb_tree_node *rb_tree_new_node(void *value) {
 
   node->value = value;
   node->color = RED;
+  node->left = NULL;
+  node->right = NULL;
+  node->parent = NULL;
 
   return node;
 }
